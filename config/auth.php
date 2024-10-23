@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'web',           // Default guard for standard users
+        'passwords' => 'users',     // Default password reset configuration
     ],
 
     /*
@@ -24,21 +24,41 @@ return [
     |--------------------------------------------------------------------------
     |
     | Next, you may define every authentication guard for your application.
-    | Of course, a great default configuration has been defined for you
-    | here which uses session storage and the Eloquent user provider.
-    |
-    | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
+    | Laravel supports session storage and token-based authentication out
+    | of the box. You may define additional guards as needed.
     |
     | Supported: "session"
     |
     */
 
     'guards' => [
-        'web' => [
+        'web' => [                     // Default web guard
             'driver' => 'session',
             'provider' => 'users',
+        ],
+
+        'api' => [                     // Default API guard (optional)
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => false,
+        ],
+
+        // Distributor Guard
+        'distributor' => [
+            'driver' => 'session',
+            'provider' => 'distributors',
+        ],
+
+        // Supervisor Guard
+        'supervisor' => [
+            'driver' => 'session',
+            'provider' => 'supervisors',
+        ],
+
+        // Factory Guard
+        'factory' => [
+            'driver' => 'session',
+            'provider' => 'factories',
         ],
     ],
 
@@ -48,55 +68,90 @@ return [
     |--------------------------------------------------------------------------
     |
     | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
-    |
-    | If you have multiple user tables or models you may configure multiple
-    | sources which represent each model / table. These sources may then
-    | be assigned to any extra authentication guards you have defined.
+    | users are retrieved from your database or other storage mechanisms.
+    | If you have multiple user tables or models, you may define multiple
+    | sources which represent each model/table.
     |
     | Supported: "database", "eloquent"
     |
     */
 
     'providers' => [
-        'users' => [
+        'users' => [                   // Default user provider
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        // Distributor Provider
+        'distributors' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Distributor::class,
+        ],
+
+        // Supervisor Provider
+        'supervisors' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Supervisor::class,
+        ],
+
+        // Factory Provider
+        'factories' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Factory::class,
+        ],
+
+        /*
+        // Example of Database Provider (if needed)
+        'users_db' => [
+            'driver' => 'database',
+            'table' => 'users',
+        ],
+        */
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Resetting Passwords
+    | Password Reset Settings
     |--------------------------------------------------------------------------
     |
-    | You may specify multiple password reset configurations if you have more
-    | than one user table or model in the application and you want to have
-    | separate password reset settings based on the specific user types.
-    |
-    | The expiry time is the number of minutes that each reset token will be
-    | considered valid. This security feature keeps tokens short-lived so
-    | they have less time to be guessed. You may change this as needed.
-    |
-    | The throttle setting is the number of seconds a user must wait before
-    | generating more password reset tokens. This prevents the user from
-    | quickly generating a very large amount of password reset tokens.
+    | Although you're not using password resets, Laravel requires at least one
+    | password broker. Here, we're defining it for the default users. You can
+    | add more brokers if you decide to implement password resets for other
+    | user types in the future.
     |
     */
 
     'passwords' => [
-        'users' => [
+        'users' => [                   // Default password reset configuration
             'provider' => 'users',
-            'table' => 'password_reset_tokens',
+            'table' => 'password_resets',
+            'expire' => 60,           // Minutes
+            'throttle' => 60,         // Minutes
+        ],
+
+        /*
+        // Uncomment and configure if password resets are needed for other user types
+        'distributors' => [
+            'provider' => 'distributors',
+            'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        'supervisors' => [
+            'provider' => 'supervisors',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'factories' => [
+            'provider' => 'factories',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        */
     ],
 
     /*
@@ -110,6 +165,6 @@ return [
     |
     */
 
-    'password_timeout' => 10800,
+    'password_timeout' => 10800, // Seconds (3 hours)
 
 ];
