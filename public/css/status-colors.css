@@ -1,0 +1,39 @@
+/* Default style for all rows */
+table tr {
+    color: #000; /* Default text color */
+}
+
+/* Submitted - Gray */
+.status-submitted {
+    background-color: #e0e0e0; /* Light Gray */
+}
+
+/* Confirmed - Green */
+.status-confirmed {
+    background-color: #d4edda; /* Light Green */
+}
+
+/* Pending - Yellow */
+.status-pending {
+    background-color: #fff3cd; /* Light Yellow */
+}
+
+/* Rejected - Red */
+.status-rejected {
+    background-color: #f8d7da; /* Light Red */
+}
+
+/* On Progress - Blue */
+.status-on-progress {
+    background-color: #d1ecf1; /* Light Blue */
+}
+
+/* Ready - Purple */
+.status-ready {
+    background-color: #e2d6f3; /* Light Purple */
+}
+
+/* Optional: Hover effect to highlight the row */
+table tr:hover {
+    opacity: 0.9;
+}

@@ -12,15 +12,17 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Distributor Routes
-Route::middleware(['distributor'])->group(function () {
+Route::middleware(['auth:distributor'])->group(function () {
     Route::get('/distributor/dashboard', [DistributorController::class, 'dashboard'])->name('distributor.dashboard');
-    // Add more distributor-specific routes here
+    Route::get('/distributor/create-request', [DistributorController::class, 'createRequest'])->name('distributor.create-request');
+    Route::post('/distributor/store-request', [DistributorController::class, 'storeRequest'])->name('distributor.store-request');
+    Route::delete('/distributor/delete-request/{id}', [DistributorController::class, 'deleteRequest'])->name('distributor.delete-request');
 });
 
 // Supervisor Routes
-Route::middleware(['supervisor'])->group(function () {
+Route::middleware(['auth:supervisor'])->group(function () {
     Route::get('/supervisor/dashboard', [SupervisorController::class, 'dashboard'])->name('supervisor.dashboard');
-    // Add more supervisor-specific routes here
+    Route::post('/supervisor/update-status', [SupervisorController::class, 'updateStatus'])->name('supervisor.update-status');
 });
 
 // Factory Routes
