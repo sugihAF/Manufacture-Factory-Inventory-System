@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SparepartRequest;
 use App\Models\Invoice;
+use App\Models\Sparepart;
 
 class DistributorController extends Controller
 {
