@@ -51,6 +51,38 @@
             </tbody>
         </table>
     @endif
+
+    <h3 class="mt-4">Your Invoices</h3>
+    @if($invoices->isEmpty())
+        <p>No invoices found.</p>
+    @else
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Request ID</th>
+                    <th>Total Amount</th>
+                    <th>Invoice Date</th>
+                    <th>Payment Date</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($invoices as $invoice)
+                    <tr>
+                        <td>{{ $invoice->id }}</td>
+                        <td>{{ $invoice->request_id }}</td>
+                        <td>{{ formatRupiah($invoice->total_amount) }}</td>
+                        <td>{{ $invoice->invoice_date }}</td>
+                        <td>{{ $invoice->payment_date }}</td>
+                        <td>{{ $invoice->status }}</td>
+                        <td>{{ $invoice->due_date }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

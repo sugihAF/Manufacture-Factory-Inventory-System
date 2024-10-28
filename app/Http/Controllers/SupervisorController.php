@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SparepartRequest;
+use App\Models\Invoice;
+use Carbon\Carbon;
 
 class SupervisorController extends Controller
 {
@@ -34,6 +36,17 @@ class SupervisorController extends Controller
         $sparepartRequest = SparepartRequest::findOrFail($request->id);
         $sparepartRequest->status = $request->status;
         $sparepartRequest->save();
+
+        // Create an invoice if the status is 'Confirmed'
+        if ($request->status === 'Confirmed') {
+            Invoice::create([
+                'distributor_id' => $sparepartRequest->distributor_id,
+                'request_id' => $sparepartRequest->id,
+                'total_amount' => $sparepartRequest->qty * $sparepartRequest->sparepart->price,
+                'invoice_date' => Carbon::now(),
+                'due_date' => Carbon::now()->addWeek(),
+            ]);
+        }
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
     }

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Sparepart;
 use App\Models\SparepartRequest;
+use App\Models\Invoice;
 
 class DistributorController extends Controller
 {
@@ -13,7 +13,9 @@ class DistributorController extends Controller
     {
         $distributor = Auth::guard('distributor')->user();
         $sparepartRequests = SparepartRequest::where('distributor_id', $distributor->id)->get();
-        return view('distributor.dashboard', compact('sparepartRequests'));
+        $invoices = Invoice::where('distributor_id', $distributor->id)->get();
+
+        return view('distributor.dashboard', compact('sparepartRequests', 'invoices'));
     }
 
     public function createRequest()
@@ -35,19 +37,19 @@ class DistributorController extends Controller
             'distributor_id' => $distributor->id,
             'sparepart_id' => $request->sparepart_id,
             'qty' => $request->qty,
-            'status' => 'pending',
+            'status' => 'Submitted',
             'request_date' => now(),
         ]);
 
         return redirect()->route('distributor.dashboard')->with('success', 'Request created successfully.');
     }
-    
+
     public function deleteRequest($id)
     {
-    $distributor = Auth::guard('distributor')->user();
-    $request = SparepartRequest::where('id', $id)->where('distributor_id', $distributor->id)->firstOrFail();
-    $request->delete();
+        $distributor = Auth::guard('distributor')->user();
+        $request = SparepartRequest::where('id', $id)->where('distributor_id', $distributor->id)->firstOrFail();
+        $request->delete();
 
-    return redirect()->route('distributor.dashboard')->with('success', 'Request deleted successfully.');
+        return redirect()->route('distributor.dashboard')->with('success', 'Request deleted successfully.');
     }
 }
