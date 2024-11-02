@@ -81,6 +81,13 @@
                         <td>{{ $invoice->due_date }}</td>
                         <td>
                             <a href="{{ route('invoices.pdf', $invoice->id) }}" class="btn btn-primary btn-sm">Download PDF</a>
+                            @if($invoice->status === 'Pending')
+                            <a href="{{ route('payment.pay', $invoice->id) }}" class="btn btn-primary btn-sm">Pay Now</a>
+                            @elseif($invoice->status === 'Paid')
+                                <span class="badge bg-success">Paid</span>
+                            @else
+                                <span class="badge bg-secondary">{{ $invoice->status }}</span>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

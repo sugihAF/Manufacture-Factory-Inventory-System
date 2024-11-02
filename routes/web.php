@@ -6,6 +6,7 @@ use App\Http\Controllers\DistributorController;
 use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
 
 
 // Authentication Routes
@@ -19,6 +20,8 @@ Route::middleware(['auth:distributor'])->group(function () {
     Route::get('/distributor/create-request', [DistributorController::class, 'createRequest'])->name('distributor.create-request');
     Route::post('/distributor/store-request', [DistributorController::class, 'storeRequest'])->name('distributor.store-request');
     Route::delete('/distributor/delete-request/{id}', [DistributorController::class, 'deleteRequest'])->name('distributor.delete-request');
+    Route::get('/payment/pay/{invoiceId}', [PaymentController::class, 'payWithPayPal'])->name('payment.pay');
+    Route::get('/payment/status/{invoiceId}', [PaymentController::class, 'getPaymentStatus'])->name('payment.status');
 });
 
 // Supervisor Routes
