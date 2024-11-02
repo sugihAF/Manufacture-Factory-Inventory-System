@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DistributorController;
 use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\FactoryController;
+use App\Http\Controllers\InvoiceController;
+
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -30,3 +32,5 @@ Route::middleware(['factory'])->group(function () {
     Route::get('/factory/dashboard', [FactoryController::class, 'dashboard'])->name('factory.dashboard');
     // Add more factory-specific routes here
 });
+
+Route::get('/invoices/{id}/pdf', [InvoiceController::class, 'generatePDF'])->name('invoices.pdf');

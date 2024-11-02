@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\SparepartRequest;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class InvoiceController extends Controller
 {
@@ -71,5 +72,16 @@ class InvoiceController extends Controller
         $invoice->delete();
 
         return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
+    }
+    public function generatePDF($id)
+    {
+        // Fetch the invoice with related data
+        $invoice = Invoice::with(['distributor', 'sparepartRequest.sparepart'])->findOrFail($id);
+
+        // Load the view and pass the data
+        $pdf = PDF::loadView('invoices.pdf', compact('invoice'));
+
+        // Stream the PDF back to the browser
+        return $pdf->stream('invoice_' . $invoice->id . '.pdf');
     }
 }

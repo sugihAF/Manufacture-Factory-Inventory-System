@@ -4,7 +4,7 @@
     <title>Distributor Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <link href="{{ asset('css/status-colors.css') }}" rel="stylesheet">
+    <!-- <link href="{{ asset('css/status-colors.css') }}" rel="stylesheet"> -->
 </head>
 <body>
 <div class="container mt-5">
@@ -66,6 +66,7 @@
                     <th>Payment Date</th>
                     <th>Status</th>
                     <th>Due Date</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -78,6 +79,9 @@
                         <td>{{ $invoice->payment_date }}</td>
                         <td>{{ $invoice->status }}</td>
                         <td>{{ $invoice->due_date }}</td>
+                        <td>
+                            <a href="{{ route('invoices.pdf', $invoice->id) }}" class="btn btn-primary btn-sm">Download PDF</a>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
