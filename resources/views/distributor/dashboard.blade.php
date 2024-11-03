@@ -148,6 +148,11 @@
         </section>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white text-center py-4 mt-10">
+        <p>&copy; 2024 PT. My Spare Parts. <br> All Rights Reserved. </p>
+    </footer>
+
     <!-- JavaScript -->
     <script>
         function toggleSidebar() {
