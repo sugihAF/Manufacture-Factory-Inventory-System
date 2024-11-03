@@ -10,7 +10,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
-        /* Custom styles for the sidebar and content layout */
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
@@ -78,8 +77,20 @@
         .status-text-on-progress { color: blue; }
         .status-text-ready { color: purple; }
         .status-text-done { color: green; }
+        .table-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            padding: 20px;
+        }
         .table-hover tbody tr:hover {
             background-color: #f1f1f1;
+        }
+        .table {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
         }
         .table thead {
             background-color: #007bff;
@@ -87,11 +98,12 @@
         }
         .table th, .table td {
             vertical-align: middle;
+            text-align: center;
         }
         footer {
             background-color: #343a40;
             color: white;
-            padding: 10px 0;
+            padding: 5px 0;
             text-align: center;
             position: fixed;
             bottom: 0;
@@ -126,54 +138,54 @@
 
 <!-- Main Content -->
 <div id="mainContent" class="content container mt-5">
-    
-
     <!-- New Sparepart Requests Section -->
     <section id="newRequests" class="mt-4">
         <h3>New Sparepart Requests</h3>
         @if($newRequests->isEmpty())
             <p>No new sparepart requests found.</p>
         @else
-            <table class="table table-bordered mt-3 table-hover">
-                <thead>
-                    <tr>
-                        <th class="text-start">ID</th>
-                        <th class="text-start">Distributor</th>
-                        <th class="text-start">Sparepart</th>
-                        <th class="text-start">Quantity</th>
-                        <th class="text-start">Status</th>
-                        <th class="text-start">Request Date</th>
-                        <th class="text-start">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($newRequests as $request)
-                        @php
-                            $status = strtolower(trim($request->status));
-                            $statusClass = 'status-text-' . str_replace(' ', '-', $status);
-                        @endphp
+            <div class="table-wrapper">
+                <table class="table table-bordered mt-3 table-hover">
+                    <thead>
                         <tr>
-                            <td>{{ $request->id }}</td>
-                            <td>{{ $request->distributor->name }}</td>
-                            <td>{{ $request->sparepart->name }}</td>
-                            <td>{{ $request->qty }}</td>
-                            <td class="status-text {{ $statusClass }}">{{ $request->status }}</td>
-                            <td>{{ $request->request_date }}</td>
-                            <td>
-                                @if($status != 'confirmed')
-                                    <button class="btn btn-success btn-sm action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
-                                @endif
-                                @if($status != 'pending')
-                                    <button class="btn btn-warning btn-sm action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
-                                @endif
-                                @if($status != 'rejected')
-                                    <button class="btn btn-danger btn-sm action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
-                                @endif
-                            </td>
+                            <th class="text-start">ID</th>
+                            <th class="text-start">Distributor</th>
+                            <th class="text-start">Sparepart</th>
+                            <th class="text-start">Quantity</th>
+                            <th class="text-start">Status</th>
+                            <th class="text-start">Request Date</th>
+                            <th class="text-start">Action</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($newRequests as $request)
+                            @php
+                                $status = strtolower(trim($request->status));
+                                $statusClass = 'status-text-' . str_replace(' ', '-', $status);
+                            @endphp
+                            <tr>
+                                <td>{{ $request->id }}</td>
+                                <td>{{ $request->distributor->name }}</td>
+                                <td>{{ $request->sparepart->name }}</td>
+                                <td>{{ $request->qty }}</td>
+                                <td class="status-text {{ $statusClass }}">{{ $request->status }}</td>
+                                <td>{{ $request->request_date }}</td>
+                                <td>
+                                    @if($status != 'confirmed')
+                                        <button class="btn btn-success btn-sm action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
+                                    @endif
+                                    @if($status != 'pending')
+                                        <button class="btn btn-warning btn-sm action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
+                                    @endif
+                                    @if($status != 'rejected')
+                                        <button class="btn btn-danger btn-sm action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
     </section>
 
@@ -183,46 +195,48 @@
         @if($ongoingRequests->isEmpty())
             <p>No ongoing sparepart requests found.</p>
         @else
-            <table class="table table-bordered mt-3 table-hover">
-                <thead>
-                    <tr>
-                        <th class="text-start">ID</th>
-                        <th class="text-start">Distributor</th>
-                        <th class="text-start">Sparepart</th>
-                        <th class="text-start">Quantity</th>
-                        <th class="text-start">Status</th>
-                        <th class="text-start">Request Date</th>
-                        <th class="text-start">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($ongoingRequests as $request)
-                        @php
-                            $status = strtolower(trim($request->status));
-                            $statusClass = 'status-text-' . str_replace(' ', '-', $status);
-                        @endphp
+            <div class="table-wrapper">
+                <table class="table table-bordered mt-3 table-hover">
+                    <thead>
                         <tr>
-                            <td>{{ $request->id }}</td>
-                            <td>{{ $request->distributor->name }}</td>
-                            <td>{{ $request->sparepart->name }}</td>
-                            <td>{{ $request->qty }}</td>
-                            <td class="status-text {{ $statusClass }}">{{ $request->status }}</td>
-                            <td>{{ $request->request_date }}</td>
-                            <td>
-                                @if($status != 'confirmed')
-                                    <button type="button" class="btn btn-success btn-sm action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
-                                @endif
-                                @if($status != 'pending')
-                                    <button type="button" class="btn btn-warning btn-sm action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
-                                @endif
-                                @if($status != 'rejected')
-                                    <button type="button" class="btn btn-danger btn-sm action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
-                                @endif
-                            </td>
+                            <th class="text-start">ID</th>
+                            <th class="text-start">Distributor</th>
+                            <th class="text-start">Sparepart</th>
+                            <th class="text-start">Quantity</th>
+                            <th class="text-start">Status</th>
+                            <th class="text-start">Request Date</th>
+                            <th class="text-start">Action</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($ongoingRequests as $request)
+                            @php
+                                $status = strtolower(trim($request->status));
+                                $statusClass = 'status-text-' . str_replace(' ', '-', $status);
+                            @endphp
+                            <tr>
+                                <td>{{ $request->id }}</td>
+                                <td>{{ $request->distributor->name }}</td>
+                                <td>{{ $request->sparepart->name }}</td>
+                                <td>{{ $request->qty }}</td>
+                                <td class="status-text {{ $statusClass }}">{{ $request->status }}</td>
+                                <td>{{ $request->request_date }}</td>
+                                <td>
+                                    @if($status != 'confirmed')
+                                        <button class="btn btn-success btn-sm action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
+                                    @endif
+                                    @if($status != 'pending')
+                                        <button class="btn btn-warning btn-sm action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
+                                    @endif
+                                    @if($status != 'rejected')
+                                        <button class="btn btn-danger btn-sm action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
     </section>
 
@@ -232,34 +246,36 @@
         @if($historyRequests->isEmpty())
             <p>No history of sparepart requests found.</p>
         @else
-            <table class="table table-bordered mt-3 table-hover">
-                <thead>
-                    <tr>
-                        <th class="text-start">ID</th>
-                        <th class="text-start">Distributor</th>
-                        <th class="text-start">Sparepart</th>
-                        <th class="text-start">Quantity</th>
-                        <th class="text-start">Status</th>
-                        <th class="text-start">Request Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($historyRequests as $request)
-                        @php
-                            $status = strtolower(trim($request->status));
-                            $statusClass = 'status-text-' . str_replace(' ', '-', $status);
-                        @endphp
+            <div class="table-wrapper">
+                <table class="table table-bordered mt-3 table-hover">
+                    <thead>
                         <tr>
-                            <td>{{ $request->id }}</td>
-                            <td>{{ $request->distributor->name }}</td>
-                            <td>{{ $request->sparepart->name }}</td>
-                            <td>{{ $request->qty }}</td>
-                            <td class="status-text {{ $statusClass }}">{{ $request->status }}</td>
-                            <td>{{ $request->request_date }}</td>
+                            <th class="text-start">ID</th>
+                            <th class="text-start">Distributor</th>
+                            <th class="text-start">Sparepart</th>
+                            <th class="text-start">Quantity</th>
+                            <th class="text-start">Status</th>
+                            <th class="text-start">Request Date</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($historyRequests as $request)
+                            @php
+                                $status = strtolower(trim($request->status));
+                                $statusClass = 'status-text-' . str_replace(' ', '-', $status);
+                            @endphp
+                            <tr>
+                                <td>{{ $request->id }}</td>
+                                <td>{{ $request->distributor->name }}</td>
+                                <td>{{ $request->sparepart->name }}</td>
+                                <td>{{ $request->qty }}</td>
+                                <td class="status-text {{ $statusClass }}">{{ $request->status }}</td>
+                                <td>{{ $request->request_date }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
     </section>
 </div>
