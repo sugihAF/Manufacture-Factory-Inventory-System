@@ -65,7 +65,7 @@
 <body class="font-sans bg-gray-100 text-gray-800">
 
     <!-- Sidebar -->
-    <div id="sidebar" class="sidebar active fixed top-0 left-0 w-64 h-full bg-gray-800 text-white p-4 overflow-y-auto shadow-md">
+    <div id="sidebar" class="sidebar active fixed top-0 left-0 w-64 h-full bg-gray-900 text-white p-4 overflow-y-auto shadow-md">
         <a href="#" class="block mb-3 text-xl font-bold" onclick="toggleSidebar()">✕ Close</a>
         <a href="#newRequests" onclick="showSection(event, 'newRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">New Sparepart Requests</a>
         <a href="#ongoingRequests" onclick="showSection(event, 'ongoingRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Ongoing Sparepart Requests</a>
