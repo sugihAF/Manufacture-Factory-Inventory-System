@@ -24,23 +24,27 @@
         .shifted {
             margin-left: 16rem;
         }
-    </style>
 
-    <style>
         .footer {
             position: fixed;
             left: 0;
             bottom: 0;
             width: 100%;
-            background-color: #f1f1f1;
             text-align: center;
-            padding: 10px 0;
+            padding: 5px 0;
             z-index: 1000;
         }
+
         body {
             margin: 0;
-            padding-bottom: 50px; /* Adjusted to ensure content doesn't overlap footer */
+            padding-bottom: 50px;
             box-sizing: border-box;
+        }
+
+        /* Hover style for sidebar menu */
+        .sidebar a:hover {
+            background-color: #4a5568;
+            border-radius: 0.25rem;
         }
     </style>
 
@@ -61,7 +65,7 @@
 <body class="font-sans bg-gray-100 text-gray-800">
 
     <!-- Sidebar -->
-    <div id="sidebar" class="sidebar inactive fixed top-0 left-0 w-64 h-full bg-gray-800 text-white p-4 overflow-y-auto shadow-md">
+    <div id="sidebar" class="sidebar active fixed top-0 left-0 w-64 h-full bg-gray-800 text-white p-4 overflow-y-auto shadow-md">
         <a href="#" class="block mb-3 text-xl font-bold" onclick="toggleSidebar()">✕ Close</a>
         <a href="#newRequests" onclick="showSection(event, 'newRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">New Sparepart Requests</a>
         <a href="#ongoingRequests" onclick="showSection(event, 'ongoingRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Ongoing Sparepart Requests</a>
@@ -71,8 +75,8 @@
     <!-- Header -->
     <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
             <button class="bg-gray-800 p-2 rounded-md hover:bg-gray-700" onclick="toggleSidebar()">☰</button>
+            <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
         </div>
         <div class="flex items-center space-x-4">
             <span>Supervisor: <strong>supervisor@example.com</strong></span>
@@ -84,7 +88,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div id="mainContent" class="p-6 mt-6 transition-all">
+    <div id="mainContent" class="p-6 mt-6 transition-all shifted">
         <!-- New Sparepart Requests Section -->
         <section id="newRequests" class="mt-6">
             <h3 class="text-2xl font-semibold mb-4">New Sparepart Requests</h3>
@@ -228,7 +232,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white text-center py-4 mt-10">
+    <footer class="footer bg-gray-900 text-white text-center py-4">
         <p>&copy; 2024 PT. My Spare Parts. <br> All Rights Reserved. </p>
     </footer>
 
