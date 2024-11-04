@@ -45,6 +45,7 @@
         .sidebar a:hover {
             background-color: #4a5568;
             border-radius: 0.25rem;
+            color : rgba(0,185,185,255)
         }
     </style>
 
