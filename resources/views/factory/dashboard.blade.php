@@ -42,37 +42,125 @@
     @if($factory->machines->isEmpty())
         <p class="mt-4">You have no machines assigned.</p>
     @else
-        <h3 class="mt-4">Your Machines</h3>
-        <table class="table table-striped mt-3">
-            <thead class="table-dark">
+    <h3 class="mt-5">Your Machines</h3>
+    <table class="table table-striped table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Action</th> <!-- Action column -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($factory->machines as $machine)
                 <tr>
-                    <th>Machine ID</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Action</th> <!-- Action column -->
+                    <td>{{ $machine->id }}</td>
+                    <td>{{ $machine->name }}</td>
+                    <td>{{ $machine->status }}</td>
+                    <td>
+                        @if($machine->status !== 'Maintenance')
+                            <form action="{{ route('factory.machine.maintenance', $machine->id) }}" method="POST" class="d-inline maintenance-form">
+                                @csrf
+                                <button type="submit" class="btn btn-warning btn-sm">Maintenance</button>
+                            </form>
+                        @else
+                            <form action="{{ route('factory.machine.available', $machine->id) }}" method="POST" class="d-inline available-form">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-sm">Available</button>
+                            </form>
+                        @endif
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($factory->machines as $machine)
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+
+    <!-- Workloads Table -->
+    <h3 class="mt-5">Your Workloads</h3>
+    <table class="table table-striped table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Request ID</th>
+                <th>Machine ID</th>
+                <th>Start Date</th>
+                <th>Completion Date</th>
+                <th>Status</th>
+                <th>Supervisor Approval</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Action</th> <!-- New Action Column -->
+            </tr>
+        </thead>
+        <tbody>
+            @if($workloads->isEmpty())
+                <tr>
+                    <td colspan="10" class="text-center">No workloads available.</td>
+                </tr>
+            @else
+                @foreach($workloads as $workload)
                     <tr>
-                        <td>{{ $machine->id }}</td>
-                        <td>{{ $machine->name }}</td>
-                        <td>{{ $machine->status }}</td>
+                        <td>{{ $workload->id }}</td>
+                        <td>{{ $workload->request_id }}</td>
+                        <td>{{ $workload->machine_id ?? 'N/A' }}</td>
+                        <td>{{ $workload->start_date ? $workload->start_date->format('Y-m-d H:i') : 'N/A' }}</td>
+                        <td>{{ $workload->completion_date ? $workload->completion_date->format('Y-m-d H:i') : 'N/A' }}</td>
+                        <td>{{ $workload->status }}</td>
+                        <td>{{ $workload->supervisor_approval }}</td>
+                        <td>{{ $workload->created_at->format('Y-m-d H:i') }}</td>
+                        <td>{{ $workload->updated_at->format('Y-m-d H:i') }}</td>
                         <td>
-                            @if($machine->status !== 'Maintenance')
-                                <form action="{{ route('factory.machine.maintenance', $machine->id) }}" method="POST" class="d-inline maintenance-form">
-                                    @csrf
-                                    <button type="submit" class="btn btn-warning btn-sm">Maintenance</button>
-                                </form>
+                            @if($workload->status !== 'Working' && $workload->status !== 'Completed')
+                                <button type="button" class="btn btn-primary btn-sm accept-button" data-bs-toggle="modal" data-bs-target="#acceptModal" data-workload-id="{{ $workload->id }}">
+                                    Accept
+                                </button>
                             @else
-                                <span class="text-muted">In Maintenance</span>
+                                <span class="text-muted">N/A</span>
                             @endif
                         </td>
                     </tr>
                 @endforeach
-            </tbody>
-        </table>
-    @endif
+            @endif
+        </tbody>
+    </table>
+
+    <!-- Accept Workload Modal -->
+    <div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" action="" id="acceptWorkloadForm">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="acceptModalLabel">Accept Workload</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="machineSelect" class="form-label">Select Machine</label>
+                            <select class="form-select" id="machineSelect" name="machine_id" required>
+                                <option value="" selected disabled>Choose a machine</option>
+                                @foreach($availableMachines as $machine)
+                                    <option value="{{ $machine->id }}">{{ $machine->name }} (ID: {{ $machine->id }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if($availableMachines->isEmpty())
+                            <p class="text-danger">No available machines to assign.</p>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        @if(!$availableMachines->isEmpty())
+                            <button type="submit" class="btn btn-primary">Assign Machine</button>
+                        @endif
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <!-- Bootstrap JS Bundle (includes Popper) -->
@@ -124,6 +212,17 @@
                 alert.close();
             }, 5000); // 5000 milliseconds = 5 seconds
         }
+
+        // Handle Accept Button Click to Populate Modal
+        const acceptButtons = document.querySelectorAll('.accept-button');
+        acceptButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                const workloadId = this.getAttribute('data-workload-id');
+                // Update the form action URL with the workload ID
+                const form = document.getElementById('acceptWorkloadForm');
+                form.action = `{{ url('/factory/workload') }}/${workloadId}/accept`;
+            });
+        });
     });
 </script>
 </body>

@@ -88,6 +88,7 @@ class PaymentController extends Controller
                         // Create new Workload record
                         Workload::create([
                             'request_id' => $sparepartRequest->id,
+                            'factory_id' => 1, // Default factory ID
                             // Other nullable columns remain null for now
                         ]);
                 

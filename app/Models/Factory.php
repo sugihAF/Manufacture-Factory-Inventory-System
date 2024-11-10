@@ -22,4 +22,8 @@ class Factory extends Authenticatable
     {
         return $this->hasMany(Machine::class);
     }
+    public function workloads()
+    {
+        return $this->hasMany(Workload::class);
+    }
 }

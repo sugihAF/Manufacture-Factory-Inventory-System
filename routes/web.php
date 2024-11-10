@@ -31,9 +31,15 @@ Route::middleware(['auth:supervisor'])->group(function () {
 });
 
 // Factory Routes
-Route::middleware(['factory'])->group(function () {
-    Route::get('/factory/dashboard', [FactoryController::class, 'dashboard'])->name('factory.dashboard');
+Route::group(['prefix' => 'factory', 'middleware' => ['auth:factory']], function () {
+    Route::get('/dashboard', [FactoryController::class, 'dashboard'])->name('factory.dashboard');
+
+    // Route to handle Maintenance action
     Route::post('/machine/{id}/maintenance', [FactoryController::class, 'setMachineMaintenance'])->name('factory.machine.maintenance');
+
+    // Route to handle Workload Acceptance
+    Route::post('/workload/{id}/accept', [FactoryController::class, 'acceptWorkload'])->name('factory.workload.accept');
+    Route::post('/factory/machine/{id}/available', [FactoryController::class, 'setMachineAvailable'])->name('factory.machine.available');
 });
 
 Route::get('/invoices/{id}/pdf', [InvoiceController::class, 'generatePDF'])->name('invoices.pdf');
