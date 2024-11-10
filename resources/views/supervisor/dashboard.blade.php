@@ -47,19 +47,33 @@
             border-radius: 0.25rem;
             color : rgba(0,185,185,255)
         }
+
+        .action-column {
+        width: 1%;
+        white-space: nowrap;
+        }
+
+        .action-button {
+        padding: 0.25rem 0.5rem;
+        }
     </style>
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('table').DataTable({
-                "paging": true,
-                "pageLength": 10
-            });
+    $(document).ready(function() {
+        $('table').DataTable({
+            "paging": true,
+            "pageLength": 10,
+            "columnDefs": [
+                { "width": "10%", "targets": -1 } // Sets the last column (Action column) to 10% width
+            ],
+            "autoWidth": false // Disables automatic column width calculation
         });
-    </script>
+    });
+</script>
+
 
 </head>
 
@@ -144,54 +158,57 @@
 
         <!-- Ongoing Sparepart Requests Section -->
         <section id="ongoingRequests" class="mt-6" style="display: none;">
-            <h3 class="text-2xl font-semibold mb-4">Ongoing Sparepart Requests</h3>
-            @if($ongoingRequests->isEmpty())
-                <p class="text-gray-500">No ongoing sparepart requests found.</p>
-            @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                        <thead class="bg-gray-800 text-white">
-                            <tr>
-                                <th class="py-3 px-4 text-left">ID</th>
-                                <th class="py-3 px-4 text-left">Distributor</th>
-                                <th class="py-3 px-4 text-left">Sparepart</th>
-                                <th class="py-3 px-4 text-left">Quantity</th>
-                                <th class="py-3 px-4 text-left">Status</th>
-                                <th class="py-3 px-4 text-left">Request Date</th>
-                                <th class="py-3 px-4 text-left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($ongoingRequests as $request)
-                                @php
-                                    $status = strtolower(trim($request->status));
-                                    $statusClass = 'status-text-' . str_replace(' ', '-', $status);
-                                @endphp
-                                <tr class="border-b hover:bg-gray-100">
-                                    <td class="py-2 px-4">{{ $request->id }}</td>
-                                    <td class="py-2 px-4">{{ $request->distributor->name }}</td>
-                                    <td class="py-2 px-4">{{ $request->sparepart->name }}</td>
-                                    <td class="py-2 px-4">{{ $request->qty }}</td>
-                                    <td class="py-2 px-4 font-bold {{ $statusClass }}">{{ $request->status }}</td>
-                                    <td class="py-2 px-4">{{ $request->request_date }}</td>
-                                    <td class="py-2 px-4 flex space-x-2">
-                                        @if($status != 'confirmed')
-                                            <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
-                                        @endif
-                                        @if($status != 'pending')
-                                            <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
-                                        @endif
-                                        @if($status != 'rejected')
-                                            <button class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </section>
+    <h3 class="text-2xl font-semibold mb-4">Ongoing Sparepart Requests</h3>
+    @if($ongoingRequests->isEmpty())
+        <p class="text-gray-500">No ongoing sparepart requests found.</p>
+    @else
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="py-2 px-3 text-center">ID</th>
+                        <th class="py-2 px-3 text-center">Distributor</th>
+                        <th class="py-2 px-3 text-center">Sparepart</th>
+                        <th class="py-2 px-3 text-center">Quantity</th>
+                        <th class="py-2 px-3 text-center">Status</th>
+                        <th class="py-2 px-3 text-center">Request Date</th>
+                        <th class="py-2 px-3 text-center action-column">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($ongoingRequests as $request)
+                        @php
+                            $status = strtolower(trim($request->status));
+                            $statusClass = 'status-text-' . str_replace(' ', '-', $status);
+                        @endphp
+                        <tr class="hover:bg-gray-100">
+                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->id }}</td>
+                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->distributor->name }}</td>
+                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->sparepart->name }}</td>
+                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->qty }}</td>
+                            <td class="py-2 px-3 text-center font-bold border border-gray-150 {{ $statusClass }}">{{ $request->status }}</td>
+                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->request_date }}</td>
+                            <td class="py-2 px-3 text-center border border-gray-150">
+                                <div class="flex justify-center space-x-1">
+                                    @if($status != 'confirmed')
+                                        <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
+                                    @endif
+                                    @if($status != 'pending')
+                                        <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
+                                    @endif
+                                    @if($status != 'rejected')
+                                        <button class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</section>
+
 
         <!-- History of Sparepart Requests Section -->
         <section id="historyRequests" class="mt-6" style="display: none;">
