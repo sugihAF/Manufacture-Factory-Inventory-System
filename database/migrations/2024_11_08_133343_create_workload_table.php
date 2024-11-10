@@ -17,9 +17,10 @@ class CreateWorkloadTable extends Migration
             // 1. ID in 'WKLD-001' format
             $table->string('id')->primary();
             // 2. Request_id from sparepart_requests table (foreign key)
-            $table->unsignedBigInteger('request_id');
+            $table->String('request_id');
             // 3. Factory_id from factory table (foreign key)
-            $table->unsignedBigInteger('factory_id');
+            $table->unsignedBigInteger('factory_id')->nullable();
+            $table->String('machine_id')->nullable();
             // 4. Start_date set to current timestamp
             $table->timestamp('start_date')->useCurrent();
             // 5. Completion_date nullable
@@ -27,7 +28,7 @@ class CreateWorkloadTable extends Migration
             // 6. Status with default 'available'
             $table->enum('status', ['busy', 'available'])->default('available');
             // 7. Supervisor_approval from supervisor table (foreign key)
-            $table->unsignedBigInteger('supervisor_approval');
+            $table->unsignedBigInteger('supervisor_approval')->nullable();
             // Timestamps (created_at and updated_at)
             $table->timestamps();
             // Foreign Key Constraints

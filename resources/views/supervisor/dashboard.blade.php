@@ -66,6 +66,7 @@
         <a href="#newRequests" onclick="showSection(event, 'newRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">New Sparepart Requests</a>
         <a href="#ongoingRequests" onclick="showSection(event, 'ongoingRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Ongoing Sparepart Requests</a>
         <a href="#historyRequests" onclick="showSection(event, 'historyRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">History of Sparepart Requests</a>
+        <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Workloads</a>
     </div>
 
     <!-- Header -->
@@ -225,6 +226,40 @@
                 </div>
             @endif
         </section>
+        
+        <!-- Workloads Section -->
+        <section id="workloads" class="mt-6" style="display: none;">
+            <h3 class="text-2xl font-semibold mb-4">Workloads</h3>
+            @if($workloads->isEmpty())
+                <p class="text-gray-500">No workloads found.</p>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                        <thead class="bg-gray-800 text-white">
+                            <tr>
+                                <th class="py-3 px-4 text-left">ID</th>
+                                <th class="py-3 px-4 text-left">Request ID</th>
+                                <th class="py-3 px-4 text-left">Status</th>
+                                <th class="py-3 px-4 text-left">Start Date</th>
+                                <th class="py-3 px-4 text-left">Completion Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($workloads as $workload)
+                                <tr class="border-b hover:bg-gray-100">
+                                    <td class="py-2 px-4">{{ $workload->id }}</td>
+                                    <td class="py-2 px-4">{{ $workload->request_id }}</td>
+                                    <td class="py-2 px-4">{{ $workload->status }}</td>
+                                    <td class="py-2 px-4">{{ $workload->start_date }}</td>
+                                    <td class="py-2 px-4">{{ $workload->completion_date }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </section>
+
     </div>
 
     <!-- Footer -->

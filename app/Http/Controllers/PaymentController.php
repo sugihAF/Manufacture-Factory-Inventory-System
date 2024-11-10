@@ -9,6 +9,7 @@ use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use Carbon\Carbon;
+use App\Models\Workload;
 
 class PaymentController extends Controller
 {
@@ -79,13 +80,22 @@ class PaymentController extends Controller
                     $invoice->status = 'Paid';
                     $invoice->payment_date = Carbon::now()->setTimezone('Asia/Jakarta');
                     $invoice->save();
-
-                    // Update the associated SparepartRequest status to 'On Progress'
+                
+                    // Retrieve the associated SparepartRequest
                     $sparepartRequest = $invoice->sparepartRequest;
+                
                     if ($sparepartRequest) {
+                        // Create new Workload record
+                        Workload::create([
+                            'request_id' => $sparepartRequest->id,
+                            // Other nullable columns remain null for now
+                        ]);
+                
+                        // Update the SparepartRequest status to 'On Progress'
                         $sparepartRequest->status = 'On Progress';
                         $sparepartRequest->save();
                     }
+                
                     return redirect()
                         ->route('distributor.dashboard')
                         ->with('success', 'Payment completed successfully.');

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SparepartRequest;
 use App\Models\Invoice;
 use Carbon\Carbon;
+use App\Models\Workload;
 
 class SupervisorController extends Controller
 {
@@ -23,7 +24,9 @@ class SupervisorController extends Controller
             ->whereIn('status', ['Done', 'Rejected'])
             ->get();
 
-        return view('supervisor.dashboard', compact('newRequests', 'ongoingRequests', 'historyRequests'));
+            $workloads = Workload::with('sparepartRequest')->get();
+
+            return view('supervisor.dashboard', compact('newRequests', 'ongoingRequests', 'historyRequests', 'workloads'));
     }
 
     public function updateStatus(Request $request)
