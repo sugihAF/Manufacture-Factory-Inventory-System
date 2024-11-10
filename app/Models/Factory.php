@@ -18,4 +18,8 @@ class Factory extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    public function machines()
+    {
+        return $this->hasMany(Machine::class);
+    }
 }

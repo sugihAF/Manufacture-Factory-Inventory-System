@@ -33,7 +33,7 @@ Route::middleware(['auth:supervisor'])->group(function () {
 // Factory Routes
 Route::middleware(['factory'])->group(function () {
     Route::get('/factory/dashboard', [FactoryController::class, 'dashboard'])->name('factory.dashboard');
-    // Add more factory-specific routes here
+    Route::post('/machine/{id}/maintenance', [FactoryController::class, 'setMachineMaintenance'])->name('factory.machine.maintenance');
 });
 
 Route::get('/invoices/{id}/pdf', [InvoiceController::class, 'generatePDF'])->name('invoices.pdf');
