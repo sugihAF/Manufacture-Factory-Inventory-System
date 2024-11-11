@@ -1,229 +1,259 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factory Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- SweetAlert2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Optional: Customize the appearance of alerts */
-        .alert {
-            position: relative;
-            transition: opacity 0.5s ease-out;
+        .sidebar {
+            transition: transform 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #4a5568;
+            border-radius: 0.25rem;
+            color: rgba(0,185,185,255);
+        }
+
+        .sidebar.active {
+            transform: translateX(0%);
+        }
+
+        .sidebar.inactive {
+            transform: translateX(-100%);
+        }
+
+        .shifted {
+            margin-left: 16rem;
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            z-index: 1000;
+        }
+
+        body {
+            margin: 0;
+            padding-bottom: 50px;
+            box-sizing: border-box;
+        }
+
+        .table-header {
+            background-color: #0D475D;
+            color: white;
+        }
+
+        .action-button-accept {
+            background-color: #38A169;
+            color: white;
+        }
+
+        .action-button-pending {
+            background-color: #DD6B20;
+            color: white;
+        }
+
+        .action-button-reject {
+            background-color: #E53E3E;
+            color: white;
+        }
+
+        .action-button {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: bold;
+            margin-right: 0.25rem;
         }
     </style>
 </head>
-<body>
-<div class="container mt-5">
-    <h2>Welcome, {{ $factory->name }}</h2>
-    <p>This is your dashboard.</p>
 
-    <!-- Logout Form -->
-    <form method="POST" action="{{ route('logout') }}" class="mt-3">
-        @csrf
-        <button type="submit" class="btn btn-danger">Logout</button>
-    </form>
+<body class="font-sans bg-gray-100 text-gray-800">
 
-    <!-- Display Success or Error Messages -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert" id="success-alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @elseif(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert" id="error-alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <!-- Machines Table -->
-    @if($factory->machines->isEmpty())
-        <p class="mt-4">You have no machines assigned.</p>
-    @else
-    <h3 class="mt-5">Your Machines</h3>
-    <table class="table table-striped table-hover mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Action</th> <!-- Action column -->
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($factory->machines as $machine)
-                <tr>
-                    <td>{{ $machine->id }}</td>
-                    <td>{{ $machine->name }}</td>
-                    <td>{{ $machine->status }}</td>
-                    <td>
-                        @if($machine->status !== 'Maintenance')
-                            <form action="{{ route('factory.machine.maintenance', $machine->id) }}" method="POST" class="d-inline maintenance-form">
-                                @csrf
-                                <button type="submit" class="btn btn-warning btn-sm">Maintenance</button>
-                            </form>
-                        @else
-                            <form action="{{ route('factory.machine.available', $machine->id) }}" method="POST" class="d-inline available-form">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-sm">Available</button>
-                            </form>
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-    @endif
-
-    <!-- Workloads Table -->
-    <h3 class="mt-5">Your Workloads</h3>
-    <table class="table table-striped table-hover mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Request ID</th>
-                <th>Machine ID</th>
-                <th>Start Date</th>
-                <th>Completion Date</th>
-                <th>Status</th>
-                <th>Supervisor Approval</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-                <th>Action</th> <!-- New Action Column -->
-            </tr>
-        </thead>
-        <tbody>
-            @if($workloads->isEmpty())
-                <tr>
-                    <td colspan="10" class="text-center">No workloads available.</td>
-                </tr>
-            @else
-                @foreach($workloads as $workload)
-                    <tr>
-                        <td>{{ $workload->id }}</td>
-                        <td>{{ $workload->request_id }}</td>
-                        <td>{{ $workload->machine_id ?? 'N/A' }}</td>
-                        <td>{{ $workload->start_date ? $workload->start_date->format('Y-m-d H:i') : 'N/A' }}</td>
-                        <td>{{ $workload->completion_date ? $workload->completion_date->format('Y-m-d H:i') : 'N/A' }}</td>
-                        <td>{{ $workload->status }}</td>
-                        <td>{{ $workload->supervisor_approval }}</td>
-                        <td>{{ $workload->created_at->format('Y-m-d H:i') }}</td>
-                        <td>{{ $workload->updated_at->format('Y-m-d H:i') }}</td>
-                        <td>
-                            @if($workload->status !== 'Working' && $workload->status !== 'Completed')
-                                <button type="button" class="btn btn-primary btn-sm accept-button" data-bs-toggle="modal" data-bs-target="#acceptModal" data-workload-id="{{ $workload->id }}">
-                                    Accept
-                                </button>
-                            @else
-                                <span class="text-muted">N/A</span>
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-            @endif
-        </tbody>
-    </table>
-
-    <!-- Accept Workload Modal -->
-    <div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form method="POST" action="" id="acceptWorkloadForm">
-                @csrf
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="acceptModalLabel">Accept Workload</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="machineSelect" class="form-label">Select Machine</label>
-                            <select class="form-select" id="machineSelect" name="machine_id" required>
-                                <option value="" selected disabled>Choose a machine</option>
-                                @foreach($availableMachines as $machine)
-                                    <option value="{{ $machine->id }}">{{ $machine->name }} (ID: {{ $machine->id }})</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @if($availableMachines->isEmpty())
-                            <p class="text-danger">No available machines to assign.</p>
-                        @endif
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        @if(!$availableMachines->isEmpty())
-                            <button type="submit" class="btn btn-primary">Assign Machine</button>
-                        @endif
-                    </div>
-                </div>
-            </form>
-        </div>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar inactive fixed top-0 left-0 w-64 h-full bg-gray-900 text-white p-4 overflow-y-auto shadow-md">
+        <a href="#" class="block mb-3 text-xl font-bold" onclick="toggleSidebar()">✕ Close</a>
+        <a href="#machines" onclick="showSection(event, 'machines')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Machines</a>
+        <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Workloads</a>
     </div>
 
-</div>
+    <!-- Header -->
+    <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <button class="bg-gray-800 p-2 rounded-md hover:bg-gray-700" onclick="toggleSidebar()">Menu ☰</button>
+            <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
+        </div>
+        <div class="flex items-center space-x-4">
+            <span>Factory: <strong>{{ Auth::user()->email }}</strong></span>
+            <form method="POST" action="{{ route('logout') }}" id="logoutForm">
+                @csrf
+                <button type="button" onclick="confirmLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Logout</button>
+            </form>
+        </div>
+    </nav>
 
-<!-- Bootstrap JS Bundle (includes Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- SweetAlert2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Main Content -->
+    <div id="mainContent" class="p-6 mt-6 transition-all">
 
-<!-- SweetAlert Confirmation and Auto-hide Scripts -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle Maintenance Button Click with SweetAlert Confirmation
-        const maintenanceForms = document.querySelectorAll('.maintenance-form');
-        maintenanceForms.forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent the form from submitting immediately
+        <!-- Machines Section -->
+        <section id="machines" class="mt-6">
+            <h2 class="text-2xl font-semibold mb-4">Your Machines</h2>
+            @if(session('success'))
+                <div class="bg-green-100 text-green-700 px-4 py-3 rounded mb-4" id="success-alert">
+                    {{ session('success') }}
+                </div>
+            @elseif(session('error'))
+                <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4" id="error-alert">
+                    {{ session('error') }}
+                </div>
+            @endif
 
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'Do you want to set this machine to Maintenance?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, set it!',
-                    cancelButtonText: 'Cancel',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit(); // Submit the form if confirmed
-                    }
-                });
-            });
-        });
+            @if($factory->machines->isEmpty())
+                <p class="text-gray-500">You have no machines assigned.</p>
+            @else
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md mb-6 display" id="machinesTable">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="py-3 px-4 text-center">ID</th>
+                            <th class="py-3 px-4 text-center">Name</th>
+                            <th class="py-3 px-4 text-center">Status</th>
+                            <th class="py-3 px-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($factory->machines as $machine)
+                            <tr class="border-b hover:bg-gray-100">
+                                <td class="py-2 px-4 text-center">{{ $machine->id }}</td>
+                                <td class="py-2 px-4 text-center">{{ $machine->name }}</td>
+                                <td class="py-2 px-4 text-center">{{ $machine->status }}</td>
+                                <td class="py-2 px-4 text-center">
+                                    @if($machine->status !== 'Maintenance')
+                                        <form action="{{ route('factory.machine.maintenance', $machine->id) }}" method="POST" class="inline maintenance-form">
+                                            @csrf
+                                            <button type="submit" class="action-button action-button-pending">Maintenance</button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('factory.machine.available', $machine->id) }}" method="POST" class="inline available-form">
+                                            @csrf
+                                            <button type="submit" class="action-button action-button-accept">Available</button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </section>
 
-        // Auto-hide Success Alert after 5 Seconds
-        const successAlert = document.getElementById('success-alert');
-        if (successAlert) {
-            setTimeout(function() {
-                // Use Bootstrap's alert close method
-                const alert = new bootstrap.Alert(successAlert);
-                alert.close();
-            }, 5000); // 5000 milliseconds = 5 seconds
+        <!-- Workloads Section -->
+        <section id="workloads" class="mt-6" style="display: none;">
+            <h2 class="text-2xl font-semibold mb-4">Your Workloads</h2>
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md display" id="workloadsTable">
+                <thead class="table-header">
+                    <tr>
+                        <th class="py-3 px-4 text-center">ID</th>
+                        <th class="py-3 px-4 text-center">Request ID</th>
+                        <th class="py-3 px-4 text-center">Machine ID</th>
+                        <th class="py-3 px-4 text-center">Start Date</th>
+                        <th class="py-3 px-4 text-center">Completion Date</th>
+                        <th class="py-3 px-4 text-center">Status</th>
+                        <th class="py-3 px-4 text-center">Supervisor Approval</th>
+                        <th class="py-3 px-4 text-center">Created At</th>
+                        <th class="py-3 px-4 text-center">Updated At</th>
+                        <th class="py-3 px-4 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if($workloads->isEmpty())
+                        <tr>
+                            <td colspan="10" class="text-center py-4">No workloads available.</td>
+                        </tr>
+                    @else
+                        @foreach($workloads as $workload)
+                            <tr class="border-b hover:bg-gray-100">
+                                <td class="py-2 px-4 text-center">{{ $workload->id }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->request_id }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->machine_id ?? 'N/A' }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->start_date ? $workload->start_date->format('Y-m-d H:i') : 'N/A' }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->completion_date ? $workload->completion_date->format('Y-m-d H:i') : 'N/A' }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->status }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->supervisor_approval }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->created_at->format('Y-m-d H:i') }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->updated_at->format('Y-m-d H:i') }}</td>
+                                <td class="py-2 px-4 text-center">
+                                    @if($workload->status !== 'Working' && $workload->status !== 'Completed')
+                                        <button type="button" class="action-button action-button-accept" data-workload-id="{{ $workload->id }}" onclick="openAcceptModal(this)">Accept</button>
+                                    @else
+                                        <span class="text-gray-500">N/A</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer bg-gray-900 text-white text-center py-4">
+        <p>&copy; 2024 PT. My Spare Parts. <br> All Rights Reserved. </p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            sidebar.classList.toggle('active');
+            sidebar.classList.toggle('inactive');
+            mainContent.classList.toggle('shifted');
         }
 
-        // Auto-hide Error Alert after 5 Seconds
-        const errorAlert = document.getElementById('error-alert');
-        if (errorAlert) {
-            setTimeout(function() {
-                // Use Bootstrap's alert close method
-                const alert = new bootstrap.Alert(errorAlert);
-                alert.close();
-            }, 5000); // 5000 milliseconds = 5 seconds
+        function showSection(event, sectionId) {
+            event.preventDefault();
+            document.querySelectorAll('section').forEach(section => section.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+            toggleSidebar();
         }
 
-        // Handle Accept Button Click to Populate Modal
-        const acceptButtons = document.querySelectorAll('.accept-button');
-        acceptButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                const workloadId = this.getAttribute('data-workload-id');
-                // Update the form action URL with the workload ID
-                const form = document.getElementById('acceptWorkloadForm');
-                form.action = `{{ url('/factory/workload') }}/${workloadId}/accept`;
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Are you sure you want to logout?',
+                text: "You can cancel if you change your mind.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, logout'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('logoutForm').submit();
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            $('#machinesTable, #workloadsTable').DataTable({
+                "paging": true,
+                "pageLength": 10,
+                "autoWidth": false
             });
         });
-    });
-</script>
+    </script>
 </body>
+
 </html>
