@@ -6,6 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Sparepart Request</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            z-index: 1000;
+        }
+
+        body {
+            margin: 0;
+            padding-bottom: 50px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 
 <body class="font-sans bg-gray-100 text-gray-800">
@@ -13,7 +32,7 @@
     <!-- Header -->
     <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <span>Distributor Dashboard</span>
+        <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
         </div>
         <div class="flex items-center space-x-4">
             <span>Distributor: <strong>{{ Auth::user()->email }}</strong></span>
@@ -25,8 +44,12 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+    <div id="mainContent" class="p-6 mt-6 mx-auto max-w-3xl bg-white rounded-lg shadow-lg">
+        <!-- Back Button -->
+        <a href="{{ route('distributor.dashboard') }}" class="bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded-lg mb-6 inline-block">← Back to Distributor Dashboard</a>
+        
         <h2 class="text-2xl font-semibold mb-6">Create Sparepart Request</h2>
+        
         <form method="POST" action="{{ route('distributor.store-request') }}" id="createRequestForm">
             @csrf
             <div class="mb-4">
@@ -46,12 +69,11 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white text-center py-4 mt-10">
+    <footer class="footer bg-gray-900 text-white text-center py-4">
         <p>&copy; 2024 PT. My Spare Parts. <br> All Rights Reserved. </p>
     </footer>
 
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function confirmLogout() {
             Swal.fire({

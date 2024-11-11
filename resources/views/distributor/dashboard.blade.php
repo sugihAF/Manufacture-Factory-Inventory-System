@@ -75,7 +75,7 @@
     <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
         <div class="flex items-center space-x-4">
             <button class="bg-gray-800 p-2 rounded-md hover:bg-gray-700" onclick="toggleSidebar()">Menu ☰</button>
-            <span>Distributor Dashboard</span>
+            <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
         </div>
         <div class="flex items-center space-x-4">
             <span>Distributor: <strong>{{ Auth::user()->email }}</strong></span>
@@ -92,7 +92,7 @@
         <!-- Sparepart Requests Section -->
         <section id="sparepartRequests" class="mt-6">
             <h3 class="text-2xl font-semibold mb-4">Your Sparepart Requests</h3>
-            <a href="{{ route('distributor.create-request') }}" class="bg-green-500 text-white px-4 py-2 rounded mb-4 inline-block">Create Request</a>
+            <a href="{{ route('distributor.create-request') }}" class="bg-green-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Request</a>
             @if($sparepartRequests->isEmpty())
                 <p class="text-gray-500">No sparepart requests found.</p>
             @else
