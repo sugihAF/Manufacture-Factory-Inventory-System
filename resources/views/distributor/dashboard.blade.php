@@ -17,7 +17,7 @@
         }
 
         .sidebar.active {
-            transform: translateX(0);
+            transform: translateX(0%);
         }
 
         .sidebar.inactive {
@@ -26,6 +26,38 @@
 
         .shifted {
             margin-left: 16rem;
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            z-index: 1000;
+        }
+
+        body {
+            margin: 0;
+            padding-bottom: 50px;
+            box-sizing: border-box;
+        }
+
+        .sidebar a:hover {
+            background-color: #4a5568;
+            border-radius: 0.25rem;
+            color: rgba(0,185,185,255);
+        }
+
+        .table-header {
+            background-color: #0D475D;
+            color: white;
+        }
+
+        .table-body {
+            background-color: #f7fafc;
+            color: #2d3748;
         }
     </style>
 </head>
@@ -42,8 +74,8 @@
     <!-- Header -->
     <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
         <div class="flex items-center space-x-4">
+            <button class="bg-gray-800 p-2 rounded-md hover:bg-gray-700" onclick="toggleSidebar()">Menu ☰</button>
             <span>Distributor Dashboard</span>
-            <button class="bg-gray-800 p-2 rounded-md hover:bg-gray-700" onclick="toggleSidebar()">☰</button>
         </div>
         <div class="flex items-center space-x-4">
             <span>Distributor: <strong>{{ Auth::user()->email }}</strong></span>
@@ -66,25 +98,25 @@
             @else
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                        <thead class="bg-gray-800 text-white">
+                        <thead class="table-header">
                             <tr>
-                                <th class="py-3 px-4 text-left">ID</th>
-                                <th class="py-3 px-4 text-left">Sparepart</th>
-                                <th class="py-3 px-4 text-left">Quantity</th>
-                                <th class="py-3 px-4 text-left">Status</th>
-                                <th class="py-3 px-4 text-left">Request Date</th>
-                                <th class="py-3 px-4 text-left">Actions</th>
+                                <th class="py-3 px-4 text-center">ID</th>
+                                <th class="py-3 px-4 text-center">Sparepart</th>
+                                <th class="py-3 px-4 text-center">Quantity</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Request Date</th>
+                                <th class="py-3 px-4 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="table-body">
                             @foreach($sparepartRequests as $request)
                                 <tr class="border-b hover:bg-gray-100">
-                                    <td class="py-2 px-4">{{ $request->id }}</td>
-                                    <td class="py-2 px-4">{{ $request->sparepart->name }}</td>
-                                    <td class="py-2 px-4">{{ $request->qty }}</td>
-                                    <td class="py-2 px-4">{{ $request->status }}</td>
-                                    <td class="py-2 px-4">{{ $request->request_date }}</td>
-                                    <td class="py-2 px-4">
+                                    <td class="py-2 px-4 text-center">{{ $request->id }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->sparepart->name }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->qty }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->status }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->request_date }}</td>
+                                    <td class="py-2 px-4 text-center">
                                         <form action="{{ route('distributor.delete-request', $request->id) }}" method="POST" class="delete-form">
                                             @csrf
                                             @method('DELETE')
@@ -107,29 +139,29 @@
             @else
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                        <thead class="bg-gray-800 text-white">
+                        <thead class="table-header">
                             <tr>
-                                <th class="py-3 px-4 text-left">ID</th>
-                                <th class="py-3 px-4 text-left">Request ID</th>
-                                <th class="py-3 px-4 text-left">Total Amount</th>
-                                <th class="py-3 px-4 text-left">Invoice Date</th>
-                                <th class="py-3 px-4 text-left">Payment Date</th>
-                                <th class="py-3 px-4 text-left">Status</th>
-                                <th class="py-3 px-4 text-left">Due Date</th>
-                                <th class="py-3 px-4 text-left">Actions</th>
+                                <th class="py-3 px-4 text-center">ID</th>
+                                <th class="py-3 px-4 text-center">Request ID</th>
+                                <th class="py-3 px-4 text-center">Total Amount</th>
+                                <th class="py-3 px-4 text-center">Invoice Date</th>
+                                <th class="py-3 px-4 text-center">Payment Date</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Due Date</th>
+                                <th class="py-3 px-4 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="table-body">
                             @foreach($invoices as $invoice)
                                 <tr class="border-b hover:bg-gray-100">
-                                    <td class="py-2 px-4">{{ $invoice->id }}</td>
-                                    <td class="py-2 px-4">{{ $invoice->request_id }}</td>
-                                    <td class="py-2 px-4">{{ formatRupiah($invoice->total_amount) }}</td>
-                                    <td class="py-2 px-4">{{ $invoice->invoice_date }}</td>
-                                    <td class="py-2 px-4">{{ $invoice->payment_date }}</td>
-                                    <td class="py-2 px-4">{{ $invoice->status }}</td>
-                                    <td class="py-2 px-4">{{ $invoice->due_date }}</td>
-                                    <td class="py-2 px-4">
+                                    <td class="py-2 px-4 text-center">{{ $invoice->id }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $invoice->request_id }}</td>
+                                    <td class="py-2 px-4 text-center">{{ formatRupiah($invoice->total_amount) }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $invoice->invoice_date }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $invoice->payment_date }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $invoice->status }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $invoice->due_date }}</td>
+                                    <td class="py-2 px-4 text-center">
                                         <a href="{{ route('invoices.pdf', $invoice->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded">Download PDF</a>
                                         @if($invoice->status === 'Pending')
                                             <a href="{{ route('payment.pay', $invoice->id) }}" class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded">Pay Now</a>
@@ -149,7 +181,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white text-center py-4 mt-10">
+    <footer class="footer bg-gray-900 text-white text-center py-4">
         <p>&copy; 2024 PT. My Spare Parts. <br> All Rights Reserved. </p>
     </footer>
 
@@ -157,9 +189,10 @@
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
             sidebar.classList.toggle('active');
             sidebar.classList.toggle('inactive');
-            document.getElementById('mainContent').classList.toggle('shifted');
+            mainContent.classList.toggle('shifted');
         }
 
         function showSection(event, sectionId) {
@@ -207,7 +240,8 @@
         $(document).ready(function() {
             $('table').DataTable({
                 "paging": true,
-                "pageLength": 10
+                "pageLength": 10,
+                "autoWidth": false
             });
         });
     </script>
