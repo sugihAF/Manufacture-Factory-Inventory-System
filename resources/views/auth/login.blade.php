@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>Login | MYSpareParts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ asset('frontend/assets/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('frontend/assets/images/logo-myspareparts.png') }}">
 
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
