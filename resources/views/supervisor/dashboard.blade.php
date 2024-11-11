@@ -98,7 +98,7 @@
         <a href="#newRequests" onclick="showSection(event, 'newRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">New Sparepart Requests</a>
         <a href="#ongoingRequests" onclick="showSection(event, 'ongoingRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Ongoing Sparepart Requests</a>
         <a href="#historyRequests" onclick="showSection(event, 'historyRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">History of Sparepart Requests</a>
-        <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Workloads</a>
+        <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Factory Workloads</a>
     </div>
 
     <!-- Header -->
@@ -266,7 +266,7 @@
         
         <!-- Workloads Section -->
     <section id="workloads" class="mt-6" style="display: none;">
-        <h3 class="text-2xl font-semibold mb-4">Workloads</h3>
+        <h3 class="text-2xl font-semibold mb-4">Factory Workloads</h3>
         @if($workloads->isEmpty())
             <p class="text-gray-500">No workloads found.</p>
         @else
