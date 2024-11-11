@@ -6,109 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ asset('frontend/assets/images/favicon.ico') }}">
 
-    <!-- Bootstrap and Template CSS -->
-    <link href="{{ asset('frontend/assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('frontend/assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('frontend/assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body class="auth-body-bg">
-    <div class="bg-overlay"></div>
-    <div class="wrapper-page">
-        <div class="container-fluid p-0">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center mt-4">
-                        <div class="mb-3">
-                            <a href="{{ url('/') }}" class="auth-logo">
-                                <img src="{{ asset('frontend/assets/images/auth-login-light.png') }}" height="40" class="logo-dark mx-auto" alt="">
-                                <!-- <img src="{{ asset('frontend/assets/images/logo-myspareparts.png') }}" height="30" class="logo-light mx-auto" alt=""> -->
-                            </a>
-                        </div>
-                    </div>
-
-                    <h4 class="text-muted text-center font-size-15"><b>Sign In</b></h4>
-
-                    <div class="p-3">
-                        <form method="POST" action="{{ route('login.submit') }}">
-                            @csrf
-
-                            <!-- Email Field -->
-                            <div class="form-group mb-3 row">
-                                <div class="col-12">
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" placeholder="Email address" value="{{ old('email') }}" required autofocus>
-                                    @error('email')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- Password Field -->
-                            <div class="form-group mb-3 row">
-                                <div class="col-12">
-                                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" placeholder="Password" required>
-                                    @error('password')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- User Type Selection -->
-                            <div class="form-group mb-3 row">
-                                <div class="col-12">
-                                    <select class="form-select @error('user_type') is-invalid @enderror" id="user_type" name="user_type" required>
-                                        <option value="">Login As</option>
-                                        <option value="distributor" {{ old('user_type') == 'distributor' ? 'selected' : '' }}>Distributor</option>
-                                        <option value="supervisor" {{ old('user_type') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
-                                        <option value="factory" {{ old('user_type') == 'factory' ? 'selected' : '' }}>Factory</option>
-                                    </select>
-                                    @error('user_type')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- Remember Me Checkbox
-                            <div class="form-group mb-3 row">
-                                <div class="col-12">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="customCheck1">
-                                        <label class="form-label ms-1" for="customCheck1">Remember me</label>
-                                    </div>
-                                </div>
-                            </div> -->
-
-                            <!-- Submit Button -->
-                            <div class="form-group mb-3 text-center row mt-3 pt-1">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-info w-100 waves-effect waves-light">Log In</button>
-                                </div>
-                            </div>
-
-                            <!-- Display Error and Success Messages -->
-                            @if(session('error'))
-                                <div class="alert alert-danger mt-3">
-                                    {{ session('error') }}
-                                </div>
-                            @endif
-                            @if(session('success'))
-                                <div class="alert alert-success mt-3">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-                        </form>
-                    </div>
-                </div>
-            </div>
+<body class="h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('{{ asset('frontend/assets/images/auth-bg.jpg') }}');">
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg w-full max-w-md p-6">
+        <div class="text-center mb-6">
+            <a href="{{ url('/') }}" class="inline-block">
+                <img src="{{ asset('frontend/assets/images/auth-login-light.png') }}" alt="Logo" class="h-10 mx-auto">
+            </a>
+            <h4 class="text-2xl font-semibold text-gray-800 mt-4">Sign In</h4>
         </div>
+
+        <form method="POST" action="{{ route('login.submit') }}" class="space-y-4">
+            @csrf
+
+            <!-- Email Field -->
+            <div>
+                <label for="email" class="block text-gray-700 font-medium">Email</label>
+                <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('email') border-red-500 @enderror" placeholder="Email address" value="{{ old('email') }}" required autofocus>
+                @error('email')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <!-- Password Field -->
+            <div>
+                <label for="password" class="block text-gray-700 font-medium">Password</label>
+                <input type="password" id="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('password') border-red-500 @enderror" placeholder="Password" required>
+                @error('password')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Log In
+                </button>
+            </div>
+
+            <!-- Display Error and Success Messages -->
+            @if(session('error'))
+                <div class="bg-red-100 text-red-600 p-3 mt-4 rounded-lg">
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div class="bg-green-100 text-green-600 p-3 mt-4 rounded-lg">
+                    {{ session('success') }}
+                </div>
+            @endif
+        </form>
     </div>
 
-    <!-- JavaScript -->
-    <script src="{{ asset('frontend/assets/libs/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('frontend/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('frontend/assets/libs/metismenu/metisMenu.min.js') }}"></script>
-    <script src="{{ asset('frontend/assets/libs/simplebar/simplebar.min.js') }}"></script>
-    <script src="{{ asset('frontend/assets/libs/node-waves/waves.min.js') }}"></script>
+    <!-- JavaScript (optional, remove if not needed) -->
     <script src="{{ asset('frontend/assets/js/app.js') }}"></script>
 </body>
 </html>

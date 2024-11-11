@@ -20,13 +20,27 @@ class LoginController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
-            'user_type' => 'required|in:distributor,supervisor,factory',
         ]);
 
         $credentials = $request->only('email', 'password');
-        $userType = $request->input('user_type');
 
-        // Determine the guard based on user type
+        // Detect user type based on email pattern
+        $userType = null;
+        $email = $request->input('email');
+
+        if (str_contains($email, 'supervisor')) {
+            $userType = 'supervisor';
+        } elseif (str_contains($email, 'distributor')) {
+            $userType = 'distributor';
+        } elseif (str_contains($email, 'factory')) {
+            $userType = 'factory';
+        } else {
+            return back()->withErrors([
+                'email' => 'User type could not be determined from email.',
+            ])->withInput($request->only('email'));
+        }
+
+        // Attempt login based on detected user type
         switch ($userType) {
             case 'distributor':
                 if (Auth::guard('distributor')->attempt($credentials)) {
@@ -50,7 +64,7 @@ class LoginController extends Controller
         // If authentication fails
         return back()->withErrors([
             'email' => 'Invalid credentials or user type.',
-        ])->withInput($request->only('email', 'user_type'));
+        ])->withInput($request->only('email'));
     }
 
     // Handle logout for all guards
