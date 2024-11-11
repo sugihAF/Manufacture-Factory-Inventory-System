@@ -14,7 +14,7 @@
         }
 
         .sidebar.active {
-            transform: translateX(0);
+            transform: translateX(0%);
         }
 
         .sidebar.inactive {
@@ -56,6 +56,19 @@
         .action-button {
         padding: 0.25rem 0.5rem;
         }
+
+            /* Table header background */
+        .table-header {
+            background-color: #0D475D; /* Dark gray (or choose any preferred color) */
+            color: white; /* White text for readability */
+        }
+
+        /* Table body background */
+        .table-body {
+            background-color: #f7fafc; /* Light gray  */
+            color: #2d3748; /* Dark text for readability */
+        }
+
     </style>
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
@@ -80,7 +93,7 @@
 <body class="font-sans bg-gray-100 text-gray-800">
 
     <!-- Sidebar -->
-    <div id="sidebar" class="sidebar active fixed top-0 left-0 w-64 h-full bg-gray-900 text-white p-4 overflow-y-auto shadow-md">
+    <div id="sidebar" class="sidebar inactive fixed top-0 left-0 w-64 h-full bg-gray-900 text-white p-4 overflow-y-auto shadow-md">
         <a href="#" class="block mb-3 text-xl font-bold" onclick="toggleSidebar()">✕ Close</a>
         <a href="#newRequests" onclick="showSection(event, 'newRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">New Sparepart Requests</a>
         <a href="#ongoingRequests" onclick="showSection(event, 'ongoingRequests')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Ongoing Sparepart Requests</a>
@@ -91,7 +104,7 @@
     <!-- Header -->
     <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <button class="bg-gray-800 p-2 rounded-md hover:bg-gray-700" onclick="toggleSidebar()">☰</button>
+            <button class="bg-gray-800 p-2 rounded-md hover:bg-gray-700" onclick="toggleSidebar()">Menu ☰</button>
             <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
         </div>
         <div class="flex items-center space-x-4">
@@ -104,7 +117,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div id="mainContent" class="p-6 mt-6 transition-all shifted">
+    <div id="mainContent" class="p-6 mt-6 transition-all">
         <!-- New Sparepart Requests Section -->
         <section id="newRequests" class="mt-6">
             <h3 class="text-2xl font-semibold mb-4">New Sparepart Requests</h3>
@@ -113,40 +126,42 @@
             @else
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                        <thead class="bg-gray-800 text-white">
+                        <thead class="table-header">
                             <tr>
-                                <th class="py-3 px-4 text-left">ID</th>
-                                <th class="py-3 px-4 text-left">Distributor</th>
-                                <th class="py-3 px-4 text-left">Sparepart</th>
-                                <th class="py-3 px-4 text-left">Quantity</th>
-                                <th class="py-3 px-4 text-left">Status</th>
-                                <th class="py-3 px-4 text-left">Request Date</th>
-                                <th class="py-3 px-4 text-left">Action</th>
+                                <th class="py-3 px-4 text-center">ID</th>
+                                <th class="py-3 px-4 text-center">Distributor</th>
+                                <th class="py-3 px-4 text-center">Sparepart</th>
+                                <th class="py-3 px-4 text-center">Quantity</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Request Date</th>
+                                <th class="py-3 px-4 text-center action-column">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="table-body">
                             @foreach($newRequests as $request)
                                 @php
                                     $status = strtolower(trim($request->status));
                                     $statusClass = 'status-text-' . str_replace(' ', '-', $status);
                                 @endphp
                                 <tr class="border-b hover:bg-gray-100">
-                                    <td class="py-2 px-4">{{ $request->id }}</td>
-                                    <td class="py-2 px-4">{{ $request->distributor->name }}</td>
-                                    <td class="py-2 px-4">{{ $request->sparepart->name }}</td>
-                                    <td class="py-2 px-4">{{ $request->qty }}</td>
-                                    <td class="py-2 px-4 font-bold {{ $statusClass }}">{{ $request->status }}</td>
-                                    <td class="py-2 px-4">{{ $request->request_date }}</td>
-                                    <td class="py-2 px-4 flex space-x-2">
-                                        @if($status != 'confirmed')
-                                            <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
-                                        @endif
-                                        @if($status != 'pending')
-                                            <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
-                                        @endif
-                                        @if($status != 'rejected')
-                                            <button class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
-                                        @endif
+                                    <td class="py-2 px-4 text-center">{{ $request->id }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->distributor->name }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->sparepart->name }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->qty }}</td>
+                                    <td class="py-2 px-4 text-center font-bold {{ $statusClass }}">{{ $request->status }}</td>
+                                    <td class="py-2 px-4 text-center">{{ $request->request_date }}</td>
+                                    <td class="py-2 px-4 text-center">
+                                        <div class="flex justify-center space-x-1">
+                                            @if($status != 'confirmed')
+                                                <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
+                                            @endif
+                                            @if($status != 'pending')
+                                                <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
+                                            @endif
+                                            @if($status != 'rejected')
+                                                <button class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -158,89 +173,49 @@
 
         <!-- Ongoing Sparepart Requests Section -->
         <section id="ongoingRequests" class="mt-6" style="display: none;">
-    <h3 class="text-2xl font-semibold mb-4">Ongoing Sparepart Requests</h3>
-    @if($ongoingRequests->isEmpty())
-        <p class="text-gray-500">No ongoing sparepart requests found.</p>
-    @else
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                <thead class="bg-gray-800 text-white">
-                    <tr>
-                        <th class="py-2 px-3 text-center">ID</th>
-                        <th class="py-2 px-3 text-center">Distributor</th>
-                        <th class="py-2 px-3 text-center">Sparepart</th>
-                        <th class="py-2 px-3 text-center">Quantity</th>
-                        <th class="py-2 px-3 text-center">Status</th>
-                        <th class="py-2 px-3 text-center">Request Date</th>
-                        <th class="py-2 px-3 text-center action-column">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($ongoingRequests as $request)
-                        @php
-                            $status = strtolower(trim($request->status));
-                            $statusClass = 'status-text-' . str_replace(' ', '-', $status);
-                        @endphp
-                        <tr class="hover:bg-gray-100">
-                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->id }}</td>
-                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->distributor->name }}</td>
-                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->sparepart->name }}</td>
-                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->qty }}</td>
-                            <td class="py-2 px-3 text-center font-bold border border-gray-150 {{ $statusClass }}">{{ $request->status }}</td>
-                            <td class="py-2 px-3 text-center border border-gray-150">{{ $request->request_date }}</td>
-                            <td class="py-2 px-3 text-center border border-gray-150">
-                                <div class="flex justify-center space-x-1">
-                                    @if($status != 'confirmed')
-                                        <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
-                                    @endif
-                                    @if($status != 'pending')
-                                        <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
-                                    @endif
-                                    @if($status != 'rejected')
-                                        <button class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endif
-</section>
-
-
-        <!-- History of Sparepart Requests Section -->
-        <section id="historyRequests" class="mt-6" style="display: none;">
-            <h3 class="text-2xl font-semibold mb-4">History of Sparepart Requests</h3>
-            @if($historyRequests->isEmpty())
-                <p class="text-gray-500">No history of sparepart requests found.</p>
+            <h3 class="text-2xl font-semibold mb-4">Ongoing Sparepart Requests</h3>
+            @if($ongoingRequests->isEmpty())
+                <p class="text-gray-500">No ongoing sparepart requests found.</p>
             @else
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                        <thead class="bg-gray-800 text-white">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                        <thead class="table-header">
                             <tr>
-                                <th class="py-3 px-4 text-left">ID</th>
-                                <th class="py-3 px-4 text-left">Distributor</th>
-                                <th class="py-3 px-4 text-left">Sparepart</th>
-                                <th class="py-3 px-4 text-left">Quantity</th>
-                                <th class="py-3 px-4 text-left">Status</th>
-                                <th class="py-3 px-4 text-left">Request Date</th>
+                                <th class="py-3 px-4 text-center">ID</th>
+                                <th class="py-3 px-4 text-center">Distributor</th>
+                                <th class="py-3 px-4 text-center">Sparepart</th>
+                                <th class="py-3 px-4 text-center">Quantity</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Request Date</th>
+                                <th class="py-3 px-4 text-center action-column">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach($historyRequests as $request)
+                        <tbody class="table-body">
+                            @foreach($ongoingRequests as $request)
                                 @php
                                     $status = strtolower(trim($request->status));
                                     $statusClass = 'status-text-' . str_replace(' ', '-', $status);
                                 @endphp
-                                <tr class="border-b hover:bg-gray-100">
-                                    <td class="py-2 px-4">{{ $request->id }}</td>
-                                    <td class="py-2 px-4">{{ $request->distributor->name }}</td>
-                                    <td class="py-2 px-4">{{ $request->sparepart->name }}</td>
-                                    <td class="py-2 px-4">{{ $request->qty }}</td>
-                                    <td class="py-2 px-4 font-bold {{ $statusClass }}">{{ $request->status }}</td>
-                                    <td class="py-2 px-4">{{ $request->request_date }}</td>
+                                <tr class="hover:bg-gray-100">
+                                    <td class="py-2 px-3 text-center border border-gray-150">{{ $request->id }}</td>
+                                    <td class="py-2 px-3 text-center border border-gray-150">{{ $request->distributor->name }}</td>
+                                    <td class="py-2 px-3 text-center border border-gray-150">{{ $request->sparepart->name }}</td>
+                                    <td class="py-2 px-3 text-center border border-gray-150">{{ $request->qty }}</td>
+                                    <td class="py-2 px-3 text-center font-bold border border-gray-150 {{ $statusClass }}">{{ $request->status }}</td>
+                                    <td class="py-2 px-3 text-center border border-gray-150">{{ $request->request_date }}</td>
+                                    <td class="py-2 px-3 text-center border border-gray-150">
+                                        <div class="flex justify-center space-x-1">
+                                            @if($status != 'confirmed')
+                                                <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
+                                            @endif
+                                            @if($status != 'pending')
+                                                <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
+                                            @endif
+                                            @if($status != 'rejected')
+                                                <button class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -248,39 +223,79 @@
                 </div>
             @endif
         </section>
+
+
+        <!-- History of Sparepart Requests Section -->
+    <section id="historyRequests" class="mt-6" style="display: none;">
+        <h3 class="text-2xl font-semibold mb-4">History of Sparepart Requests</h3>
+        @if($historyRequests->isEmpty())
+            <p class="text-gray-500">No history of sparepart requests found.</p>
+        @else
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="py-3 px-4 text-center">ID</th>
+                            <th class="py-3 px-4 text-center">Distributor</th>
+                            <th class="py-3 px-4 text-center">Sparepart</th>
+                            <th class="py-3 px-4 text-center">Quantity</th>
+                            <th class="py-3 px-4 text-center">Status</th>
+                            <th class="py-3 px-4 text-center">Request Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-body">
+                        @foreach($historyRequests as $request)
+                            @php
+                                $status = strtolower(trim($request->status));
+                                $statusClass = 'status-text-' . str_replace(' ', '-', $status);
+                            @endphp
+                            <tr class="border-b hover:bg-gray-100">
+                                <td class="py-2 px-4 text-center">{{ $request->id }}</td>
+                                <td class="py-2 px-4 text-center">{{ $request->distributor->name }}</td>
+                                <td class="py-2 px-4 text-center">{{ $request->sparepart->name }}</td>
+                                <td class="py-2 px-4 text-center">{{ $request->qty }}</td>
+                                <td class="py-2 px-4 text-center font-bold {{ $statusClass }}">{{ $request->status }}</td>
+                                <td class="py-2 px-4 text-center">{{ $request->request_date }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </section>
         
         <!-- Workloads Section -->
-        <section id="workloads" class="mt-6" style="display: none;">
-            <h3 class="text-2xl font-semibold mb-4">Workloads</h3>
-            @if($workloads->isEmpty())
-                <p class="text-gray-500">No workloads found.</p>
-            @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                        <thead class="bg-gray-800 text-white">
-                            <tr>
-                                <th class="py-3 px-4 text-left">ID</th>
-                                <th class="py-3 px-4 text-left">Request ID</th>
-                                <th class="py-3 px-4 text-left">Status</th>
-                                <th class="py-3 px-4 text-left">Start Date</th>
-                                <th class="py-3 px-4 text-left">Completion Date</th>
+    <section id="workloads" class="mt-6" style="display: none;">
+        <h3 class="text-2xl font-semibold mb-4">Workloads</h3>
+        @if($workloads->isEmpty())
+            <p class="text-gray-500">No workloads found.</p>
+        @else
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="py-3 px-4 text-center">ID</th>
+                            <th class="py-3 px-4 text-center">Request ID</th>
+                            <th class="py-3 px-4 text-center">Status</th>
+                            <th class="py-3 px-4 text-center">Start Date</th>
+                            <th class="py-3 px-4 text-center">Completion Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-body">
+                        @foreach($workloads as $workload)
+                            <tr class="border-b hover:bg-gray-100">
+                                <td class="py-2 px-4 text-center">{{ $workload->id }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->request_id }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->status }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->start_date }}</td>
+                                <td class="py-2 px-4 text-center">{{ $workload->completion_date }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($workloads as $workload)
-                                <tr class="border-b hover:bg-gray-100">
-                                    <td class="py-2 px-4">{{ $workload->id }}</td>
-                                    <td class="py-2 px-4">{{ $workload->request_id }}</td>
-                                    <td class="py-2 px-4">{{ $workload->status }}</td>
-                                    <td class="py-2 px-4">{{ $workload->start_date }}</td>
-                                    <td class="py-2 px-4">{{ $workload->completion_date }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </section>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </section>
 
     </div>
 
@@ -293,9 +308,16 @@
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
             sidebar.classList.toggle('active');
             sidebar.classList.toggle('inactive');
-            document.getElementById('mainContent').classList.toggle('shifted');
+
+            if (sidebar.classList.contains('active')) {
+                mainContent.classList.add('shifted');
+            } else {
+                mainContent.classList.remove('shifted');
+            }
         }
 
         function showSection(event, sectionId) {
