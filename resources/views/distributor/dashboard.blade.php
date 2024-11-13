@@ -97,7 +97,7 @@
                 <p class="text-gray-500">No sparepart requests found.</p>
             @else
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md border-collapse">
                         <thead class="table-header">
                             <tr>
                                 <th class="py-3 px-4 text-center">ID</th>
@@ -106,6 +106,7 @@
                                 <th class="py-3 px-4 text-center">Status</th>
                                 <th class="py-3 px-4 text-center">Request Date</th>
                                 <th class="py-3 px-4 text-center">Actions</th>
+                                <th class="py-3 px-4 text-center">Note</th>
                             </tr>
                         </thead>
                         <tbody class="table-body">
@@ -117,12 +118,31 @@
                                     <td class="py-2 px-4 text-center">{{ $request->status }}</td>
                                     <td class="py-2 px-4 text-center">{{ $request->request_date }}</td>
                                     <td class="py-2 px-4 text-center">
-                                        <form action="{{ route('distributor.delete-request', $request->id) }}" method="POST" class="delete-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded delete-button">Delete</button>
-                                        </form>
+                                        @php
+                                            $status = $request->status;
+                                        @endphp
+
+                                        @if(in_array($status, ['Confirmed', 'On Progress', 'Ready', 'Done', 'Rejected']))
+                                            @if($status === 'Confirmed')
+                                                <span class="text-blue-500 font-semibold">Request Confirmed</span>
+                                            @elseif($status === 'On Progress')
+                                                <span class="text-yellow-500 font-semibold">Request On Progress</span>
+                                            @elseif($status === 'Ready')
+                                                <span class="text-green-500 font-semibold">Request is Ready</span>
+                                            @elseif($status === 'Done')
+                                                <span class="text-green-500 font-semibold">Request Done</span>
+                                            @elseif($status === 'Rejected')
+                                                <span class="text-red-500 font-semibold">Request Rejected</span>
+                                            @endif
+                                        @else
+                                            <form action="{{ route('distributor.delete-request', $request->id) }}" method="POST" class="delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded delete-button">Delete</button>
+                                            </form>
+                                        @endif
                                     </td>
+                                    <td class="py-2 px-4 text-center">{{ $request->note ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

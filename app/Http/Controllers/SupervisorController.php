@@ -7,6 +7,8 @@ use App\Models\SparepartRequest;
 use App\Models\Invoice;
 use Carbon\Carbon;
 use App\Models\Workload;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Factory;
 
 class SupervisorController extends Controller
 {
@@ -26,31 +28,86 @@ class SupervisorController extends Controller
 
             $workloads = Workload::with('sparepartRequest')->get();
 
-            return view('supervisor.dashboard', compact('newRequests', 'ongoingRequests', 'historyRequests', 'workloads'));
+            $factories = Factory::all();
+
+            return view('supervisor.dashboard', compact('newRequests', 'ongoingRequests', 'historyRequests', 'workloads', 'factories'));
     }
 
+    /**
+     * Update the status of a sparepart request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateStatus(Request $request)
     {
-        $request->validate([
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
             'id' => 'required|exists:sparepart_requests,id',
-            'status' => 'required|in:Confirmed,Pending,Rejected',
+            'status' => 'required|in:Confirm,Reject,Pending',
+            'note' => 'nullable|string|max:255',
         ]);
 
-        $sparepartRequest = SparepartRequest::findOrFail($request->id);
-        $sparepartRequest->status = $request->status;
-        $sparepartRequest->save();
-
-        // Create an invoice if the status is 'Confirmed'
-        if ($request->status === 'Confirmed') {
-            Invoice::create([
-                'distributor_id' => $sparepartRequest->distributor_id,
-                'request_id' => $sparepartRequest->id,
-                'total_amount' => $sparepartRequest->qty * $sparepartRequest->sparepart->price,
-                'invoice_date' => Carbon::now(),
-                'due_date' => Carbon::now()->addWeek(),
-            ]);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 400);
         }
 
+        // Retrieve the sparepart_request
+        $sparepartRequest = SparepartRequest::find($request->id);
+
+        // Update status
+        switch ($request->status) {
+            case 'Confirm':
+                $sparepartRequest->status = 'Confirmed';
+                break;
+
+            case 'Pending':
+                $sparepartRequest->status = 'Pending';
+                break;
+
+            case 'Reject':
+                $sparepartRequest->status = 'Rejected';
+                break;
+
+            default:
+                return response()->json(['success' => false, 'message' => 'Invalid status.'], 400);
+        }
+
+        // Append reason to note if available
+        if (in_array($request->status, ['Reject', 'Pending']) && $request->note) {
+            $existingNote = $sparepartRequest->note ?? '';
+            $sparepartRequest->note = trim($existingNote . ' ' . $request->note);
+        }
+
+        // Save changes
+        $sparepartRequest->save();
+
         return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
+    }
+
+    /**
+     * Fetch machines based on the selected factory.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMachinesByFactory(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'factory_id' => 'required|exists:factories,id',
+        ]);
+
+        $factoryId = $request->input('factory_id');
+
+        // Fetch machines associated with the factory
+        $machines = Machine::where('factory_id', $factoryId)
+            ->select('id', 'name', 'status') // Select only necessary fields
+            ->get();
+
+        // Return the machines as JSON
+        return response()->json([
+            'machines' => $machines,
+        ]);
     }
 }

@@ -28,6 +28,7 @@ Route::middleware(['auth:distributor'])->group(function () {
 Route::middleware(['auth:supervisor'])->group(function () {
     Route::get('/supervisor/dashboard', [SupervisorController::class, 'dashboard'])->name('supervisor.dashboard');
     Route::post('/supervisor/update-status', [SupervisorController::class, 'updateStatus'])->name('supervisor.update-status');
+    Route::post('/supervisor/get-machines', [SupervisorController::class, 'getMachinesByFactory'])->name('supervisor.get-machines');
 });
 
 // Factory Routes
@@ -40,6 +41,7 @@ Route::group(['prefix' => 'factory', 'middleware' => ['auth:factory']], function
     // Route to handle Workload Acceptance
     Route::post('/workload/{id}/accept', [FactoryController::class, 'acceptWorkload'])->name('factory.workload.accept');
     Route::post('/factory/machine/{id}/available', [FactoryController::class, 'setMachineAvailable'])->name('factory.machine.available');
+    Route::post('/factory/workload/{id}/submit', [FactoryController::class, 'submitWorkload'])->name('factory.workload.submit');
 });
 
 Route::get('/invoices/{id}/pdf', [InvoiceController::class, 'generatePDF'])->name('invoices.pdf');

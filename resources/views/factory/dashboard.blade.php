@@ -208,12 +208,25 @@
                                 <td class="py-2 px-4 text-center">{{ $workload->created_at->format('Y-m-d H:i') }}</td>
                                 <td class="py-2 px-4 text-center">{{ $workload->updated_at->format('Y-m-d H:i') }}</td>
                                 <td class="py-2 px-4 text-center">
-                                    @if($workload->status !== 'Working' && $workload->status !== 'Completed')
+                                    @if($workload->status === 'Working')
+                                    <!-- Show Submit button -->
+                                    <form action="{{ route('factory.workload.submit', $workload->id) }}" method="POST" class="inline submit-form">
+                                        @csrf
+                                        <button type="button" class="btn btn-primary btn-sm submit-button">Submit</button>
+                                    </form>
+                                    @elseif($workload->status === 'Submitted')
+                                        <!-- Display 'Workload Submitted' text -->
+                                        <span class="text-blue-500 font-semibold">Workload Submitted</span>
+                                    @elseif($workload->status === 'Done')
+                                        <!-- Display 'Workload Done' text -->
+                                        <span class="text-green-500 font-semibold">Workload Done</span>
+                                    @elseif($workload->status !== 'Completed')
+                                        <!-- Show Accept button -->
                                         <button type="button" class="btn btn-primary btn-sm accept-button" data-bs-toggle="modal" data-bs-target="#acceptModal" data-workload-id="{{ $workload->id }}">
                                             Accept
                                         </button>
                                     @else
-                                        <span class="text-muted">N/A</span>
+                                        <span class="text-gray-500">N/A</span>
                                     @endif
                                 </td>
                             </tr>
@@ -324,6 +337,25 @@
             var workloadId = button.getAttribute('data-workload-id');
             var form = acceptModal.querySelector('#acceptWorkloadForm');
             form.action = `{{ url('/factory/workload') }}/${workloadId}/accept`;
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.submit-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    const form = this.closest('.submit-form');
+                    Swal.fire({
+                        title: 'Confirm Submission',
+                        text: "Are you sure you want to submit this workload?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, submit it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
         });
     </script>
 </body>

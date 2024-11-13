@@ -6,6 +6,7 @@ use App\Models\Factory;
 use App\Models\Machine;
 use App\Models\Workload;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class FactoryController extends Controller
 {
@@ -115,5 +116,62 @@ class FactoryController extends Controller
         $machine->save();
 
         return redirect()->route('factory.dashboard')->with('success', 'Workload accepted and machine assigned successfully.');
+    }
+
+    public function submitWorkload($id)
+    {
+        $factory = Auth::guard('factory')->user();
+        $workload = Workload::where('factory_id', $factory->id)
+                            ->where('id', $id)
+                            ->where('status', 'Working')
+                            ->first();
+
+        if (!$workload) {
+            return redirect()->route('factory.dashboard')->with('error', 'Workload not found or cannot be submitted.');
+        }
+
+        $workload->status = 'Submitted';
+        $workload->completion_date = Carbon::now();
+        $workload->save();
+
+        $machine = Machine::find($workload->machine_id);
+        if ($machine) {
+            $machine->status = 'Available';
+            $machine->save();
+        }
+
+        // Update sparepart_request status to 'Ready'
+        if ($workload->sparepartRequest) {
+            $sparepartRequest = $workload->sparepartRequest;
+            $sparepartRequest->status = 'Ready';
+            $sparepartRequest->save();
+        }
+
+        return redirect()->route('factory.dashboard')->with('success', 'Workload submitted successfully.');
+    }
+
+    /**
+     * Fetch machines for a specific factory.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMachines(Request $request)
+    {
+        $request->validate([
+            'factory_id' => 'required|exists:factories,id',
+        ]);
+
+        $factory = Factory::with('machines')->find($request->factory_id);
+
+        return response()->json([
+            'machines' => $factory->machines->map(function($machine) {
+                return [
+                    'id' => $machine->id,
+                    'name' => $machine->name,
+                    'status' => $machine->status,
+                ];
+            }),
+        ]);
     }
 }

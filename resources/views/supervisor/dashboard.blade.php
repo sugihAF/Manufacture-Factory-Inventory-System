@@ -204,16 +204,42 @@
                                     <td class="py-2 px-3 text-center font-bold border border-gray-150 {{ $statusClass }}">{{ $request->status }}</td>
                                     <td class="py-2 px-3 text-center border border-gray-150">{{ $request->request_date }}</td>
                                     <td class="py-2 px-3 text-center border border-gray-150">
+                                        
                                         <div class="flex justify-center space-x-1">
-                                            @if($status != 'confirmed')
-                                                <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
-                                            @endif
-                                            @if($status != 'pending')
-                                                <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>
-                                            @endif
-                                            @if($status != 'rejected')
-                                                <button class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button" data-action="Rejected" data-id="{{ $request->id }}">Reject</button>
-                                            @endif
+                                        @if($request->status === 'Confirmed')
+                                            <span class="text-blue-500 font-semibold">Request Confirmed</span>
+                                        @elseif($request->status === 'On Progress')
+                                            <span class="text-yellow-500 font-semibold">Request On Progress</span>
+                                        @elseif($request->status === 'Ready')
+                                            <span class="text-green-500 font-semibold">Request Ready</span>
+                                        @else
+                                            <!-- Action Buttons -->
+                                            <div class="flex justify-center space-x-1">
+                                                <button
+                                                    class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button"
+                                                    data-action="Confirm"
+                                                    data-id="{{ $request->id }}"
+                                                >
+                                                    Confirm
+                                                </button>
+                                                
+                                                <button
+                                                    class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button"
+                                                    data-action="Pending"
+                                                    data-id="{{ $request->id }}"
+                                                >
+                                                    Pending
+                                                </button>
+
+                                                <button
+                                                    class="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded action-button"
+                                                    data-action="Reject"
+                                                    data-id="{{ $request->id }}"
+                                                >
+                                                    Reject
+                                                </button>
+                                            </div>
+                                        @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -343,40 +369,156 @@
             });
         }
 
+        document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.action-button').forEach(button => {
             button.addEventListener('click', function () {
                 const action = this.getAttribute('data-action');
                 const requestId = this.getAttribute('data-id');
-                Swal.fire({
-                    title: `Are you sure you want to ${action.toLowerCase()} this request?`,
-                    text: "This action cannot be undone!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: `Yes, ${action.toLowerCase()} it!`
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch('{{ route('supervisor.update-status') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                            },
-                            body: JSON.stringify({ id: requestId, status: action })
-                        }).then(response => response.json()).then(data => {
-                            if (data.success) {
-                                Swal.fire('Updated!', 'The request status has been updated.', 'success').then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error!', 'There was an error updating the request status.', 'error');
-                            }
-                        });
-                    }
-                });
+
+                if (action === 'Reject') {
+                    // Define reject reasons
+                    Swal.fire({
+                        title: 'Select a Rejection Reason',
+                        input: 'select',
+                        inputOptions: {
+                            'Machine Has Problem': 'Machine Has Problem',
+                            'No Materials': 'No Materials'
+                        },
+                        inputPlaceholder: 'Select a reason',
+                        showCancelButton: true,
+                        confirmButtonText: 'Submit',
+                        cancelButtonText: 'Cancel',
+                        inputValidator: (value) => {
+                            return new Promise((resolve) => {
+                                if (value) {
+                                    resolve()
+                                } else {
+                                    resolve('You need to select a reason!')
+                                }
+                            })
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const selectedReason = result.value;
+
+                            // Send AJAX request with reason
+                            fetch('{{ route('supervisor.update-status') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: JSON.stringify({ 
+                                    id: requestId, 
+                                    status: action, 
+                                    note: selectedReason 
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Rejected!', 'The request has been rejected.', 'success').then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error!', 'There was an error processing your request.', 'error');
+                                }
+                            });
+                        }
+                    });
+
+                } else if (action === 'Pending') {
+                    // Define pending reasons
+                    Swal.fire({
+                        title: 'Select a Pending Reason',
+                        input: 'select',
+                        inputOptions: {
+                            'No Machine Available': 'No Machine Available',
+                            'Waiting for Materials': 'Waiting for Materials'
+                        },
+                        inputPlaceholder: 'Select a reason',
+                        showCancelButton: true,
+                        confirmButtonText: 'Submit',
+                        cancelButtonText: 'Cancel',
+                        inputValidator: (value) => {
+                            return new Promise((resolve) => {
+                                if (value) {
+                                    resolve()
+                                } else {
+                                    resolve('You need to select a reason!')
+                                }
+                            })
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const selectedReason = result.value;
+
+                            // Send AJAX request with reason
+                            fetch('{{ route('supervisor.update-status') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: JSON.stringify({ 
+                                    id: requestId, 
+                                    status: action, 
+                                    note: selectedReason 
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Pending!', 'The request status has been set to Pending.', 'success').then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error!', 'There was an error processing your request.', 'error');
+                                }
+                            });
+                        }
+                    });
+
+                } else if (action === 'Confirm') {
+                    // Existing Confirm action
+                    Swal.fire({
+                        title: `Are you sure you want to ${action.toLowerCase()} this request?`,
+                        text: "This action cannot be undone!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: `Yes, ${action.toLowerCase()} it!`
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Send AJAX request without reason
+                            fetch('{{ route('supervisor.update-status') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: JSON.stringify({ 
+                                    id: requestId, 
+                                    status: action 
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Confirmed!', 'The request has been confirmed.', 'success').then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error!', 'There was an error processing your request.', 'error');
+                                }
+                            });
+                        }
+                    });
+                }
             });
         });
+    });
     </script>
 </body>
 
