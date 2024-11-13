@@ -2,14 +2,29 @@
 <html lang="en">
 
 <head>
+    <!-- Meta and Title -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factory Dashboard</title>
+
+    <!-- Tailwind CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+
+    <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Bootstrap CSS (for modal) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
     <style>
+        /* Your existing styles */
         .sidebar {
             transition: transform 0.3s;
         }
@@ -17,7 +32,7 @@
         .sidebar a:hover {
             background-color: #4a5568;
             border-radius: 0.25rem;
-            color: rgba(0,185,185,255);
+            color: rgba(0, 185, 185, 255);
         }
 
         .sidebar.active {
@@ -117,7 +132,6 @@
                     {{ session('error') }}
                 </div>
             @endif
-
             @if($factory->machines->isEmpty())
                 <p class="text-gray-500">You have no machines assigned.</p>
             @else
@@ -137,16 +151,18 @@
                                 <td class="py-2 px-4 text-center">{{ $machine->name }}</td>
                                 <td class="py-2 px-4 text-center">{{ $machine->status }}</td>
                                 <td class="py-2 px-4 text-center">
-                                    @if($machine->status !== 'Maintenance')
+                                    @if($machine->status !== 'Maintenance' && $machine->status !== 'Busy')
                                         <form action="{{ route('factory.machine.maintenance', $machine->id) }}" method="POST" class="inline maintenance-form">
                                             @csrf
                                             <button type="submit" class="action-button action-button-pending">Maintenance</button>
                                         </form>
-                                    @else
+                                    @elseif($machine->status === 'Maintenance')
                                         <form action="{{ route('factory.machine.available', $machine->id) }}" method="POST" class="inline available-form">
                                             @csrf
                                             <button type="submit" class="action-button action-button-accept">Available</button>
                                         </form>
+                                    @else
+                                        <span class="text-gray-500">In Use</span>
                                     @endif
                                 </td>
                             </tr>
@@ -193,9 +209,11 @@
                                 <td class="py-2 px-4 text-center">{{ $workload->updated_at->format('Y-m-d H:i') }}</td>
                                 <td class="py-2 px-4 text-center">
                                     @if($workload->status !== 'Working' && $workload->status !== 'Completed')
-                                        <button type="button" class="action-button action-button-accept" data-workload-id="{{ $workload->id }}" onclick="openAcceptModal(this)">Accept</button>
+                                        <button type="button" class="btn btn-primary btn-sm accept-button" data-bs-toggle="modal" data-bs-target="#acceptModal" data-workload-id="{{ $workload->id }}">
+                                            Accept
+                                        </button>
                                     @else
-                                        <span class="text-gray-500">N/A</span>
+                                        <span class="text-muted">N/A</span>
                                     @endif
                                 </td>
                             </tr>
@@ -203,6 +221,43 @@
                     @endif
                 </tbody>
             </table>
+
+            <!-- Accept Workload Modal -->
+            <div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form method="POST" action="" id="acceptWorkloadForm">
+                        @csrf
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="acceptModalLabel">Accept Workload</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                @if($availableMachines->isEmpty())
+                                    <p class="text-danger">No available machines to assign.</p>
+                                @else
+                                    <div class="mb-3">
+                                        <label for="machineSelect" class="form-label">Select Machine</label>
+                                        <select class="form-select" id="machineSelect" name="machine_id" required>
+                                            <option value="" selected disabled>Choose a machine</option>
+                                            @foreach($availableMachines as $machine)
+                                                <option value="{{ $machine->id }}">{{ $machine->name }} (ID: {{ $machine->id }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                @if(!$availableMachines->isEmpty())
+                                    <button type="submit" class="btn btn-primary">Assign Machine</button>
+                                @endif
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </section>
     </div>
 
@@ -212,8 +267,16 @@
     </footer>
 
     <!-- JavaScript -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    
+    <!-- Bootstrap JS (for modal) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -252,6 +315,15 @@
                 "pageLength": 10,
                 "autoWidth": false
             });
+        });
+
+        // Accept Modal JavaScript
+        var acceptModal = document.getElementById('acceptModal');
+        acceptModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var workloadId = button.getAttribute('data-workload-id');
+            var form = acceptModal.querySelector('#acceptWorkloadForm');
+            form.action = `{{ url('/factory/workload') }}/${workloadId}/accept`;
         });
     </script>
 </body>
