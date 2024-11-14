@@ -24,15 +24,14 @@
     
     <!-- Custom Styles -->
     <style>
-        /* Your existing styles */
         .sidebar {
             transition: transform 0.3s;
         }
 
         .sidebar a:hover {
-            background-color: #4a5568;
+            background-color: #4a5568 !important;
             border-radius: 0.25rem;
-            color: rgba(0, 185, 185, 255);
+            color: rgba(0, 185, 185, 1) !important;
         }
 
         .sidebar.active {
@@ -97,11 +96,10 @@
 
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar inactive fixed top-0 left-0 w-64 h-full bg-gray-900 text-white p-4 overflow-y-auto shadow-md">
-    <a href="#" class="block mb-3 text-xl font-bold" onclick="toggleSidebar()">✕ Close</a>
-    <a href="#machines" onclick="showSection(event, 'machines')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Machines</a>
-    <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Workloads</a>
+    <a href="#" class="block mb-3 text-xl font-bold text-white no-underline" onclick="toggleSidebar()">✕ Close</a>
+    <a href="#machines" onclick="showSection(event, 'machines')" class="block p-3 mb-2 rounded text-white no-underline">Your Machines</a>
+    <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 rounded text-white no-underline">Your Workloads</a>
 </div>
-
 
     <!-- Header -->
     <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
