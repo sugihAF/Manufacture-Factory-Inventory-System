@@ -5,7 +5,7 @@
     <!-- Meta and Title -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factory Dashboard</title>
+    <title>Production Supervisor Dashboard</title>
 
     <!-- Tailwind CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -108,7 +108,7 @@
             <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
         </div>
         <div class="flex items-center space-x-4">
-            <span>Factory: <strong>{{ Auth::user()->email }}</strong></span>
+            <span>Production Supervisor: <strong>{{ Auth::user()->email }}</strong></span>
             <form method="POST" action="{{ route('logout') }}" id="logoutForm">
                 @csrf
                 <button type="button" onclick="confirmLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Logout</button>

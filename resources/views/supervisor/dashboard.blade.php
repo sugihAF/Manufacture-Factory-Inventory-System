@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor Dashboard</title>
+    <title>Supply-Chain Supervisor Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -108,7 +108,7 @@
             <img src="{{ asset('frontend/assets/images/auth-login-dark.png') }}" alt="Company Logo" class="h-8">
         </div>
         <div class="flex items-center space-x-4">
-            <span>Supervisor: <strong>supervisor@example.com</strong></span>
+            <span>Supply-Chain Supervisor: <strong>supervisor@example.com</strong></span>
             <form method="POST" action="{{ route('logout') }}" id="logoutForm">
                 @csrf
                 <button type="button" onclick="confirmLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Logout</button>
@@ -125,7 +125,7 @@
             <div class="flex space-x-2 mb-4">
                 @foreach($factories as $factory)
                     <button 
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        class="bg-green-500 text-white px-4 py-2 rounded mb-4 inline-block"
                         onclick="showMachines({{ $factory->id }}, '{{ $factory->name }}')">
                         View Machines for {{ $factory->name }}
                     </button>
