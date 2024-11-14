@@ -95,12 +95,13 @@
 
 <body class="font-sans bg-gray-100 text-gray-800">
 
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar inactive fixed top-0 left-0 w-64 h-full bg-gray-900 text-white p-4 overflow-y-auto shadow-md">
-        <a href="#" class="block mb-3 text-xl font-bold" onclick="toggleSidebar()">✕ Close</a>
-        <a href="#machines" onclick="showSection(event, 'machines')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Machines</a>
-        <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Workloads</a>
-    </div>
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar inactive fixed top-0 left-0 w-64 h-full bg-gray-900 text-white p-4 overflow-y-auto shadow-md">
+    <a href="#" class="block mb-3 text-xl font-bold" onclick="toggleSidebar()">✕ Close</a>
+    <a href="#machines" onclick="showSection(event, 'machines')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Machines</a>
+    <a href="#workloads" onclick="showSection(event, 'workloads')" class="block p-3 mb-2 hover:bg-gray-700 rounded">Your Workloads</a>
+</div>
+
 
     <!-- Header -->
     <nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
