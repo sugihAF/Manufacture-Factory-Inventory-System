@@ -185,7 +185,7 @@
             slides[currentSlide].classList.add('opacity-100');
         }
 
-        setInterval(showNextSlide, 4000);
+        setInterval(showNextSlide, 3000);
     </script>
 
     <!-- Footer -->
