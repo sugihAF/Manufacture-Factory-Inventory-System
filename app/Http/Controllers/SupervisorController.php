@@ -54,21 +54,26 @@ class SupervisorController extends Controller
 
         // Retrieve the sparepart_request
         $sparepartRequest = SparepartRequest::find($request->id);
-
+        
         // Update status
         switch ($request->status) {
             case 'Confirm':
                 $sparepartRequest->status = 'Confirmed';
+                // Create an invoice if the status is 'Confirmed'
+                Invoice::create([
+                    'distributor_id' => $sparepartRequest->distributor_id,
+                    'request_id' => $sparepartRequest->id,
+                    'total_amount' => $sparepartRequest->qty * $sparepartRequest->sparepart->price,
+                    'invoice_date' => Carbon::now(),
+                    'due_date' => Carbon::now()->addWeek(),
+                ]);
                 break;
-
             case 'Pending':
                 $sparepartRequest->status = 'Pending';
                 break;
-
             case 'Reject':
                 $sparepartRequest->status = 'Rejected';
                 break;
-
             default:
                 return response()->json(['success' => false, 'message' => 'Invalid status.'], 400);
         }

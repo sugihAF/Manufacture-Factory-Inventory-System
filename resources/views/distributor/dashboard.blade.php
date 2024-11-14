@@ -128,7 +128,7 @@
                                             @elseif($status === 'On Progress')
                                                 <span class="text-yellow-500 font-semibold">Request On Progress</span>
                                             @elseif($status === 'Ready')
-                                                <span class="text-green-500 font-semibold">Request is Ready</span>
+                                            <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded pick-up-button" data-id="{{ $request->id }}">Pick Up</button>
                                             @elseif($status === 'Done')
                                                 <span class="text-green-500 font-semibold">Request Done</span>
                                             @elseif($status === 'Rejected')
@@ -237,6 +237,44 @@
                 }
             });
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.pick-up-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const requestId = this.getAttribute('data-id');
+
+                    Swal.fire({
+                        title: 'Confirm Pick Up',
+                        text: "Are you sure you want to pick up this spare part?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, pick up',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Send AJAX request to update status
+                            fetch('{{ route('distributor.pickup-request') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ id: requestId })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Success', 'The request has been picked up.', 'success').then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error', 'An error occurred. Please try again.', 'error');
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        });
 
         document.querySelectorAll('.delete-button').forEach(button => {
             button.addEventListener('click', function() {

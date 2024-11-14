@@ -163,7 +163,7 @@
                                     <td class="py-2 px-4 text-center">
                                         <div class="flex justify-center space-x-1">
                                             @if($status != 'confirmed')
-                                                <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirmed" data-id="{{ $request->id }}">Accept</button>
+                                                <button class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded action-button" data-action="Confirm" data-id="{{ $request->id }}">Accept</button>
                                             @endif
                                             @if($status != 'pending')
                                                 <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded action-button" data-action="Pending" data-id="{{ $request->id }}">Pending</button>

@@ -26,6 +26,7 @@ Route::middleware(['auth:distributor'])->group(function () {
     Route::delete('/distributor/delete-request/{id}', [DistributorController::class, 'deleteRequest'])->name('distributor.delete-request');
     Route::get('/payment/pay/{invoiceId}', [PaymentController::class, 'payWithPayPal'])->name('payment.pay');
     Route::get('/payment/status/{invoiceId}', [PaymentController::class, 'getPaymentStatus'])->name('payment.status');
+    Route::post('/distributor/pickup-request', [DistributorController::class, 'pickupRequest'])->name('distributor.pickup-request');
 });
 
 // Supervisor Routes
@@ -38,11 +39,7 @@ Route::middleware(['auth:supervisor'])->group(function () {
 // Factory Routes
 Route::group(['prefix' => 'factory', 'middleware' => ['auth:factory']], function () {
     Route::get('/dashboard', [FactoryController::class, 'dashboard'])->name('factory.dashboard');
-
-    // Route to handle Maintenance action
     Route::post('/machine/{id}/maintenance', [FactoryController::class, 'setMachineMaintenance'])->name('factory.machine.maintenance');
-
-    // Route to handle Workload Acceptance
     Route::post('/workload/{id}/accept', [FactoryController::class, 'acceptWorkload'])->name('factory.workload.accept');
     Route::post('/factory/machine/{id}/available', [FactoryController::class, 'setMachineAvailable'])->name('factory.machine.available');
     Route::post('/factory/workload/{id}/submit', [FactoryController::class, 'submitWorkload'])->name('factory.workload.submit');

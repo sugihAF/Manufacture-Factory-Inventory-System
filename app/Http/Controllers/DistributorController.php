@@ -53,4 +53,32 @@ class DistributorController extends Controller
 
         return redirect()->route('distributor.dashboard')->with('success', 'Request deleted successfully.');
     }
+    public function pickupRequest(Request $request)
+{
+    $request->validate([
+        'id' => 'required|exists:sparepart_requests,id',
+    ]);
+
+    $distributor = Auth::guard('distributor')->user();
+    $sparepartRequest = SparepartRequest::where('id', $request->id)
+        ->where('distributor_id', $distributor->id)
+        ->first();
+
+    if (!$sparepartRequest || $sparepartRequest->status !== 'Ready') {
+        return response()->json(['success' => false, 'message' => 'Invalid request.'], 400);
+    }
+
+    // Update the request status to 'Done'
+    $sparepartRequest->status = 'Done';
+    $sparepartRequest->save();
+
+    // Update the associated Workload status to 'Done'
+    $workload = Workload::where('request_id', $sparepartRequest->id)->first();
+    if ($workload) {
+        $workload->status = 'Done';
+        $workload->save();
+    }
+
+    return response()->json(['success' => true]);
+}
 }
