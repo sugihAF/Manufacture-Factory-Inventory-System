@@ -8,6 +8,10 @@ use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 
+// Landing Page Routes 
+Route::get('/', function () {
+    return view('landing');
+});
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
