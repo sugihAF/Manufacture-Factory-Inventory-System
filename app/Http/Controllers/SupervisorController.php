@@ -91,23 +91,22 @@ class SupervisorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getMachinesByFactory(Request $request)
+    public function getMachines($factoryId)
     {
-        // Validate the incoming request data
-        $request->validate([
-            'factory_id' => 'required|exists:factories,id',
-        ]);
+        $factory = Factory::with('machines')->find($factoryId);
 
-        $factoryId = $request->input('factory_id');
+        if (!$factory) {
+            return response()->json(['machines' => []]);
+        }
 
-        // Fetch machines associated with the factory
-        $machines = Machine::where('factory_id', $factoryId)
-            ->select('id', 'name', 'status') // Select only necessary fields
-            ->get();
-
-        // Return the machines as JSON
         return response()->json([
-            'machines' => $machines,
+            'machines' => $factory->machines->map(function($machine) {
+                return [
+                    'id' => $machine->id,
+                    'name' => $machine->name,
+                    'status' => $machine->status,
+                ];
+            }),
         ]);
     }
 }

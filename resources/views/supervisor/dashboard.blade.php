@@ -121,6 +121,16 @@
         <!-- New Sparepart Requests Section -->
         <section id="newRequests" class="mt-6">
             <h3 class="text-2xl font-semibold mb-4">New Sparepart Requests</h3>
+            <!-- Factory Buttons -->
+            <div class="flex space-x-2 mb-4">
+                @foreach($factories as $factory)
+                    <button 
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onclick="showMachines({{ $factory->id }}, '{{ $factory->name }}')">
+                        View Machines for {{ $factory->name }}
+                    </button>
+                @endforeach
+            </div>
             @if($newRequests->isEmpty())
                 <p class="text-gray-500">No new sparepart requests found.</p>
             @else
@@ -322,7 +332,29 @@
             </div>
         @endif
     </section>
-
+    <!-- Machines Modal -->
+        <div id="machinesModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white rounded-lg overflow-hidden shadow-xl w-1/2">
+                <div class="px-4 py-2 bg-gray-800 text-white flex justify-between items-center">
+                    <h3 id="modalTitle" class="text-lg font-semibold"></h3>
+                    <button onclick="closeMachinesModal()" class="text-white text-2xl">&times;</button>
+                </div>
+                <div class="p-4">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 border">Machine ID</th>
+                                <th class="py-2 px-4 border">Machine Name</th>
+                                <th class="py-2 px-4 border">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="machinesTableBody">
+                            <!-- Machines will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -332,6 +364,34 @@
 
     <!-- JavaScript -->
     <script>
+        function showMachines(factoryId, factoryName) {
+            // Update modal title
+            document.getElementById('modalTitle').innerText = 'Machines for ' + factoryName;
+            // Show the modal
+            document.getElementById('machinesModal').classList.remove('hidden');
+            // Clear previous data
+            const tableBody = document.getElementById('machinesTableBody');
+            tableBody.innerHTML = '';
+            // Fetch machines data
+            fetch(`/supervisor/factory/${factoryId}/machines`)
+                .then(response => response.json())
+                .then(data => {
+                    data.machines.forEach(machine => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="py-2 px-4 border text-center">${machine.id}</td>
+                            <td class="py-2 px-4 border text-center">${machine.name}</td>
+                            <td class="py-2 px-4 border text-center">${machine.status}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+        }
+
+        function closeMachinesModal() {
+            // Hide the modal
+            document.getElementById('machinesModal').classList.add('hidden');
+        }
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');

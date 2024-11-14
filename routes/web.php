@@ -28,7 +28,7 @@ Route::middleware(['auth:distributor'])->group(function () {
 Route::middleware(['auth:supervisor'])->group(function () {
     Route::get('/supervisor/dashboard', [SupervisorController::class, 'dashboard'])->name('supervisor.dashboard');
     Route::post('/supervisor/update-status', [SupervisorController::class, 'updateStatus'])->name('supervisor.update-status');
-    Route::post('/supervisor/get-machines', [SupervisorController::class, 'getMachinesByFactory'])->name('supervisor.get-machines');
+    Route::get('/supervisor/factory/{factory}/machines', [SupervisorController::class, 'getMachines']);
 });
 
 // Factory Routes
