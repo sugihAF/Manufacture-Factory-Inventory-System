@@ -78,10 +78,9 @@ class SupervisorController extends Controller
                 return response()->json(['success' => false, 'message' => 'Invalid status.'], 400);
         }
 
-        // Append reason to note if available
+        // Ensure note is empty before adding new note
         if (in_array($request->status, ['Reject', 'Pending']) && $request->note) {
-            $existingNote = $sparepartRequest->note ?? '';
-            $sparepartRequest->note = trim($existingNote . ' ' . $request->note);
+            $sparepartRequest->note = trim($request->note);
         }
 
         // Save changes

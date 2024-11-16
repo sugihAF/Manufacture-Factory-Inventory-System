@@ -358,7 +358,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer bg-gray-900 text-white text-center py-4">
+    <footer class="footer bg-gray-900 text-white text-center py-3">
         <p>&copy; 2024 PT. My Spare Parts. <br> All Rights Reserved. </p>
     </footer>
 
